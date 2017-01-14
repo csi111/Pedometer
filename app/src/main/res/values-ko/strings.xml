@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">만보기</string>
+
+    <string name="title_penometer_history">만보기 기록</string>
+    <string name="title_penometer_status">만보기 현황</string>
+
+    <string name="action_penometer_start">Penometer Start!</string>
+    <string name="action_penometer_stop">Penometer Stop!</string>
+
+    <!-- DateFormat String -->
+    <string name="wod_date_format">yyyy.MM.dd E</string>
+
+</resources>

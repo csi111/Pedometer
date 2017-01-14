@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Penometer</string>
+
+    <string name="title_penometer_history">History</string>
+    <string name="title_penometer_status">Status</string>
+
+
+    <string name="action_penometer_start">Penometer Start!</string>
+    <string name="action_penometer_stop">Penometer Stop!</string>
+
+    <!-- DateFormat String -->
+    <string name="wod_date_format">yyyy.MM.dd E</string>
+
+</resources>

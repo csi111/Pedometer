@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_statistics"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.sean.android.pedometer.ui.StatisticsFragment"
+    tools:showIn="@layout/activity_statistics">
+
+
+    <TextView
+        android:id="@+id/step_textview"
+        style="@style/AppTheme.PenometerBigTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="0"
+        android:layout_marginTop="18dp"/>
+
+    <TextView
+        android:id="@+id/distance_textview"
+        style="@style/AppTheme.PenometerBigTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0Km"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/step_textview" />
+
+    <TextView
+        android:id="@+id/location_textview"
+        style="@style/AppTheme.PenometerTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="위치"
+        android:layout_below="@id/distance_textview"
+        android:layout_centerInParent="true" />
+
+
+
+</RelativeLayout>
