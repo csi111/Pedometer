@@ -115,14 +115,12 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
 
                 // add 'steps' to yesterdays count
                 addToLastEntry(steps);
-                addToPauseStep(0);
 
                 // add today
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_DATE, date);
                 // use the negative steps as offset
                 values.put(COLUMN_STEPS, -steps);
-                values.put(COLUMN_PAUSE_STEPS, 0);
                 getWritableDatabase().insert(TABLE_NAME, null, values);
             }
             c.close();
@@ -143,17 +141,9 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
     public void addToLastEntry(int steps) {
         Logger.debug("addToLastEntry() Steps = [" + steps +"]");
         if (steps > 0) {
-            getWritableDatabase().execSQL(SQL_ADD_LAST_ENTRY, new String[]{String.valueOf(steps)});
-//            getWritableDatabase().execSQL("UPDATE " + DB_NAME + " SET steps = steps + " + steps +
-//                    " WHERE date = (SELECT MAX(date) FROM " + DB_NAME + ")");
-        }
-    }
-    public void addToPauseStep(int steps) {
-        Logger.debug("addToPauseStep() Steps = [" + steps +"]");
-        if (steps > 0) {
-            getWritableDatabase().execSQL(SQL_ADD_PAUSE_STEP, new String[]{String.valueOf(steps)});
-//            getWritableDatabase().execSQL("UPDATE " + DB_NAME + " SET steps = steps + " + steps +
-//                    " WHERE date = (SELECT MAX(date) FROM " + DB_NAME + ")");
+//            getWritableDatabase().execSQL(SQL_ADD_LAST_ENTRY, new String[]{String.valueOf(steps)});
+            getWritableDatabase().execSQL("UPDATE " + TABLE_NAME+ " SET steps = steps + " + steps +
+                    " WHERE date = (SELECT MAX(date) FROM " + TABLE_NAME + ")");
         }
     }
 
@@ -231,15 +221,13 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
     }
 
     public List<Record> getTotalRecord() {
-        Cursor cursor = query(new String[]{COLUMN_DATE, COLUMN_STEPS, COLUMN_PAUSE_STEPS}, null, null, null, null, "date ASC", null);
+        Cursor cursor = query(new String[]{COLUMN_DATE, COLUMN_STEPS}, null, null, null, null, "date ASC", null);
 
         List<Record> records = new ArrayList<>();
 
         if (cursor.moveToFirst()) {
             do {
-                Record record = new Record(cursor.getLong(0), cursor.getInt(1));
-                record.setPauseStep(cursor.getInt(2));
-                records.add(record);
+                records.add(new Record(cursor.getLong(0), cursor.getInt(1)));
 
             } while (cursor.moveToNext());
         }
@@ -301,22 +289,6 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
         c.close();
         return step;
     }
-
-    public int getPauseSteps(final long date) {
-        Cursor c = getReadableDatabase().query(TABLE_NAME, new String[]{COLUMN_PAUSE_STEPS}, "date = ?",
-                new String[]{String.valueOf(date)}, null, null, null);
-        c.moveToFirst();
-        int step;
-        if (c.getCount() == 0) {
-            step = Integer.MIN_VALUE;
-        }
-        else {
-            step = c.getInt(0);
-        }
-        c.close();
-        return step;
-    }
-
 
     public List<Pair<Long, Integer>> getLastEntries(int num) {
         Cursor c = getReadableDatabase()
@@ -383,11 +355,6 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
 
     public int getCurrentSteps() {
         int re = getSteps(-1);
-        return re == Integer.MIN_VALUE ? 0 : re;
-    }
-
-    public int getCurrentPauseSteps() {
-        int re = getPauseSteps(-1);
         return re == Integer.MIN_VALUE ? 0 : re;
     }
 }

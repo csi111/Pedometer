@@ -29,10 +29,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class StatisticsActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
-
-    private static final int PERMISSION_REQUEST_FINE_LOCAITION = 1000;
-
+public class StatisticsActivity extends AppCompatActivity implements PermissionListener{
     @BindView(R.id.statisticsViewPager)
     ViewPager statisticsViewPager;
 
@@ -56,20 +53,24 @@ public class StatisticsActivity extends AppCompatActivity implements ActivityCom
 
         statisticsViewPager.setAdapter(tabViewPagerAdapter);
         tabLayout.setupWithViewPager(statisticsViewPager);
-
+        checkPermission();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        checkPermission();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        startService(new Intent(this, PedometerSystemOverlayService.class));
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        startService(new Intent(this, PedometerSystemOverlayService.class));
     }
 
     private List<Fragment> createTabFragments() {
@@ -82,34 +83,20 @@ public class StatisticsActivity extends AppCompatActivity implements ActivityCom
     }
 
     private void checkPermission() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+        new TedPermission(this).setPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .setPermissionListener(this)
+                .check();
 
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        PERMISSION_REQUEST_FINE_LOCAITION);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Toast.makeText(this, "Permission Result" + permissions.toString() + grantResults.toString(), Toast.LENGTH_SHORT).show();;
+    public void onPermissionGranted() {
+        Toast.makeText(this, "onPermissionGranted()", Toast.LENGTH_SHORT).show();;
+    }
+
+    @Override
+    public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+        Toast.makeText(this, "onPermissionDenied()", Toast.LENGTH_SHORT).show();;
     }
 }

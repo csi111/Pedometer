@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -23,10 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
 import com.nhn.android.maps.NMapActivity;
 import com.nhn.android.maps.NMapContext;
 import com.nhn.android.maps.NMapController;
@@ -47,23 +43,21 @@ import com.sean.android.pedometer.model.Penometer;
 import com.sean.android.pedometer.service.PedometerService;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.gun0912.tedpermission.TedPermissionActivity.REQ_CODE_PERMISSION_REQUEST;
 import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
 
 /**
  *
  */
- public class StatisticsFragment extends BaseFragment implements SensorEventListener, ServiceConnection, NMapLocationManager.OnLocationChangeListener, NMapActivity.OnDataProviderListener, PermissionListener {
+public class StatisticsFragment extends BaseFragment implements SensorEventListener, ServiceConnection, NMapLocationManager.OnLocationChangeListener, NMapActivity.OnDataProviderListener {
 
     public static final int NAVER_MAP_SCALE_LEVEL = 12;
-    final static float DEFAULT_STEP_SIZE = Locale.getDefault() == Locale.US ? 2.5f : 75f;
+    public final static float DEFAULT_STEP_SIZE = Locale.getDefault() == Locale.US ? 2.5f : 75f;
     final static String DEFAULT_STEP_UNIT = Locale.getDefault() == Locale.US ? "ft" : "cm";
 
     public final static NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
@@ -86,7 +80,6 @@ import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
     private NMapView nMapView;
     private int todayOffset;
     private int sinceBoot;
-    private int pauseStep;
     private int todaySteps;
 
     private boolean hasLocationPermission = false;
@@ -152,7 +145,7 @@ import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
     public void onStart() {
         super.onStart();
         nMapContext.onStart();
-        if(checkLocationPermission()) {
+        if (checkLocationPermission()) {
             nMapLocationManager.enableMyLocation(false);
         }
     }
@@ -167,7 +160,6 @@ import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
         todayOffset = db.getSteps(CalendarUtil.getTodayMills());
 
         sinceBoot = db.getCurrentSteps(); // do not use the value from the sharedPreferences
-        pauseStep = db.getCurrentPauseSteps();
         int pauseDifference = sinceBoot - preferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY, sinceBoot);
 
         if (!checkResumeState()) {
@@ -181,13 +173,12 @@ import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
         }
 
         sinceBoot -= pauseDifference;
-        sinceBoot += pauseStep;
 
         db.close();
 
-        Logger.debug("todayOffset : " + todayOffset + "sinceBoot : " + sinceBoot + "pauseStep :" + pauseStep + "pauseDifference :" + pauseDifference);
+        Logger.debug("todayOffset : " + todayOffset + "sinceBoot : " + sinceBoot + "pauseDifference :" + pauseDifference);
 
-        todaySteps = Math.max(todayOffset + sinceBoot + pauseStep, 0);
+        todaySteps = Math.max(todayOffset + sinceBoot, 0);
 
         updatePenometerData();
     }
@@ -195,7 +186,6 @@ import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
     @Override
     public void onPause() {
         super.onPause();
-        if(checkLocationPermission())
         nMapContext.onPause();
         try {
             SensorManager sm =
@@ -271,7 +261,7 @@ import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Logger.debug("UI - sensorChanged | todayOffset: " + todayOffset + " since boot: " + event.values[0] + " pauseStep: " + pauseStep);
+        Logger.debug("UI - sensorChanged | todayOffset: " + todayOffset + " since boot: " + event.values[0]);
         if (event.values[0] > Integer.MAX_VALUE || event.values[0] == 0) {
             return;
         }
@@ -286,7 +276,7 @@ import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
         }
         sinceBoot = (int) event.values[0];
 
-        todaySteps = Math.max(sinceBoot + todayOffset + pauseStep, 0);
+        todaySteps = Math.max(sinceBoot + todayOffset, 0);
 
         updatePenometerData();
     }
@@ -356,12 +346,11 @@ import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
         nMapView.setOnMapStateChangeListener(new MapViewStateChangeListener(nMapView.getMapController()));
     }
 
-    private void restoreInstanceState(NMapController mMapController, NGeoPoint nGeoPoint)
-    {
+    private void restoreInstanceState(NMapController mMapController, NGeoPoint nGeoPoint) {
         int viewMode = NMapView.VIEW_MODE_VECTOR;
 
         mMapController.setMapViewMode(viewMode);
-        if(nGeoPoint != null) {
+        if (nGeoPoint != null) {
             mMapController.setMapCenter(nGeoPoint, NAVER_MAP_SCALE_LEVEL);
         }
         mMapController.setMapViewTrafficMode(false);
@@ -433,28 +422,12 @@ import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
 
     private boolean checkLocationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    return true;
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                return true;
             }
-        } else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQ_CODE_PERMISSION_REQUEST);
+            return false;
         }
 
-        return false;
+        return true;
     }
-
-    @Override
-    public void onPermissionGranted() {
-        Toast.makeText(getContext(), "onPermissionGranted", Toast.LENGTH_SHORT).show();
-        hasLocationPermission = true;
-    }
-
-    @Override
-    public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-        Toast.makeText(getContext(), "onPermissionDenied\n" + deniedPermissions.toString() , Toast.LENGTH_SHORT).show();
-        hasLocationPermission = false;
-
-    }
-
 }

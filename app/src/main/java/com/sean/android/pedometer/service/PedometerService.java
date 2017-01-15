@@ -69,7 +69,6 @@ public class PedometerService extends Service implements StepListener {
             if (sharedPreferencesManager.contains(PREF_PAUSE_COUNT_KEY)) {
                 int difference = steps - sharedPreferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY);
                 db.addToLastEntry(-difference);
-                db.addToPauseStep(-difference);
                 db.close();
                 sharedPreferencesManager.removeData(PREF_PAUSE_COUNT_KEY);
             } else { // pause counting
@@ -126,7 +125,7 @@ public class PedometerService extends Service implements StepListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Logger.debug("SensorListener onDestroy");
+        Logger.debug("onDestroy");
         try {
             SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
             sm.unregisterListener(stepDetector);
@@ -173,7 +172,7 @@ public class PedometerService extends Service implements StepListener {
                 PedometerDBHelper db = PedometerDBHelper.getInstance(this);
                 if (db.getSteps(CalendarUtil.getTodayMills()) == Integer.MIN_VALUE) {
                     int pauseDifference = steps - sharedPreferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY, steps);
-
+                    Logger.debug("Steps : "+ steps + " pauseDifference :" + pauseDifference);
                     db.insertNewDay(CalendarUtil.getTodayMills(), steps - pauseDifference);
                     if (pauseDifference > 0) {
                         // update pauseCount for the new day
