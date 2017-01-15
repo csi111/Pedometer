@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">Penometer</string>
 
-    <string name="title_penometer_history">History</string>
-    <string name="title_penometer_status">Status</string>
+    <string name="title_pedometer_history">History</string>
+    <string name="title_pedometer_status">Status</string>
 
 
-    <string name="action_penometer_start">Penometer Start!</string>
-    <string name="action_penometer_stop">Penometer Stop!</string>
+    <string name="action_pedometer_start">Pedometer Start!</string>
+    <string name="action_pedometer_stop">Pedometer Stop!</string>
 
     <string name="title_stepcount">Current Step Count</string>
     <string name="title_distance">Current Distance</string>

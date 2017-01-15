@@ -48,7 +48,6 @@ public class PedometerService extends Service implements StepListener {
 
     private AbsStepSensorDetector stepDetector;
     private SharedPreferencesManager sharedPreferencesManager;
-    private StepCallback stepCallback;
 
     private IBinder serviceBinder = new ServiceBinder();
 
@@ -196,18 +195,9 @@ public class PedometerService extends Service implements StepListener {
 
     }
 
-    public void setStepCallback(StepCallback stepCallback) {
-        this.stepCallback = stepCallback;
-    }
-
     public class ServiceBinder extends Binder {
         public PedometerService getService() {
             return PedometerService.this;
         }
     }
-
-    public interface StepCallback {
-        void onStep(int value);
-    }
-
 }

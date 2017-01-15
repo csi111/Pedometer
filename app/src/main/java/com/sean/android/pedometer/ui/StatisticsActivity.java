@@ -81,8 +81,8 @@ public class StatisticsActivity extends AppCompatActivity implements PermissionL
     private List<Fragment> createTabFragments() {
         List<Fragment> tabFragments = new ArrayList<>();
 
-        statisticsFragment = (StatisticsFragment) StatisticsFragment.newInstance(this, getString(R.string.title_penometer_status));
-        pedoHistorysFragment = (PedoHistorysFragment) PedoHistorysFragment.newInstance(this, getString(R.string.title_penometer_history));
+        statisticsFragment = (StatisticsFragment) StatisticsFragment.newInstance(this, getString(R.string.title_pedometer_status));
+        pedoHistorysFragment = (PedoHistorysFragment) PedoHistorysFragment.newInstance(this, getString(R.string.title_pedometer_history));
         tabFragments.add(statisticsFragment);
         tabFragments.add(pedoHistorysFragment);
 

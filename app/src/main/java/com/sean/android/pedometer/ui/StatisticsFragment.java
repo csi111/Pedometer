@@ -132,10 +132,10 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         super.onViewCreated(view, savedInstanceState);
 
         if (!checkResumeState()) {
-            pauseButton.setText(getString(R.string.action_penometer_stop));
+            pauseButton.setText(getString(R.string.action_pedometer_stop));
             pauseButton.setBackgroundColor(getResources().getColor(R.color.colorMainTabText));
         } else {
-            pauseButton.setText(getString(R.string.action_penometer_start));
+            pauseButton.setText(getString(R.string.action_pedometer_start));
             pauseButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         }
     }
@@ -224,11 +224,11 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
             sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                     SensorManager.SENSOR_DELAY_UI, 0);
 
-            pauseButton.setText(getString(R.string.action_penometer_stop));
+            pauseButton.setText(getString(R.string.action_pedometer_stop));
             pauseButton.setBackgroundColor(getResources().getColor(R.color.colorMainTabText));
         } else {
             sm.unregisterListener(this);
-            pauseButton.setText(getString(R.string.action_penometer_start));
+            pauseButton.setText(getString(R.string.action_pedometer_start));
             pauseButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         }
 

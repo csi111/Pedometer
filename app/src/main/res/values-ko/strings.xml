@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">만보기</string>
 
-    <string name="title_penometer_history">만보기 기록</string>
-    <string name="title_penometer_status">만보기 현황</string>
+    <string name="title_pedometer_history">만보기 기록</string>
+    <string name="title_pedometer_status">만보기 현황</string>
 
-    <string name="action_penometer_start">만보기 시작!</string>
-    <string name="action_penometer_stop">만보기 중지!</string>
+    <string name="action_pedometer_start">만보기 시작!</string>
+    <string name="action_pedometer_stop">만보기 중지!</string>
 
 
     <string name="title_stepcount">걸은 횟수</string>
