@@ -33,9 +33,8 @@ import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
-import com.sean.android.pedometer.model.Penometer;
 
-import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
+import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
 
 
 public class PedometerService extends Service implements StepListener {
@@ -47,7 +46,7 @@ public class PedometerService extends Service implements StepListener {
 
     private final static int MICROSECONDS_IN_ONE_MINUTE = 60000000;
 
-    private StepSensorDetector stepDetector;
+    private AbsStepSensorDetector stepDetector;
     private SharedPreferencesManager sharedPreferencesManager;
     private StepCallback stepCallback;
 

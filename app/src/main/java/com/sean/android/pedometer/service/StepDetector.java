@@ -21,19 +21,17 @@ package com.sean.android.pedometer.service;
 import android.annotation.TargetApi;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.util.Log;
-
-import java.util.ArrayList;
 
 /**
  * Detects steps and notifies all listeners (that implement StepListener).
  * @author Levente Bagi
  */
 
-@TargetApi(15)
-public class StepDetector extends StepSensorDetector
+@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+public class StepDetector extends AbsStepSensorDetector
 {
     private final static String TAG = "StepDetector";
     private float   mLimit = 10;

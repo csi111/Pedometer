@@ -4,8 +4,8 @@
     <string name="title_penometer_history">만보기 기록</string>
     <string name="title_penometer_status">만보기 현황</string>
 
-    <string name="action_penometer_start">Penometer Start!</string>
-    <string name="action_penometer_stop">Penometer Stop!</string>
+    <string name="action_penometer_start">만보기 시작!</string>
+    <string name="action_penometer_stop">만보기 중지!</string>
 
 
     <string name="title_stepcount">걸은 횟수</string>

@@ -29,14 +29,13 @@ import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.DistanceUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
-import com.sean.android.pedometer.model.Penometer;
-import com.sean.android.pedometer.ui.PedometerMiniView;
+import com.sean.android.pedometer.model.Pedometer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
+import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
 import static com.sean.android.pedometer.ui.StatisticsFragment.DEFAULT_STEP_SIZE;
 import static com.sean.android.pedometer.ui.StatisticsFragment.formatter;
 
@@ -267,7 +266,7 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
 
     private void updatePenometerData() {
         // todayOffset might still be Integer.MIN_VALUE on first start
-        float footSize = sharedPreferencesManager.getPrefFloatData(Penometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
+        float footSize = sharedPreferencesManager.getPrefFloatData(Pedometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
         float distanceToday = todaySteps * footSize;
         stepCountTextView.setText(formatter.format(todaySteps));
         distanceTextView.setText(DistanceUtil.convertDistanceMeter(distanceToday));

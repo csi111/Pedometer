@@ -38,7 +38,7 @@ import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.DistanceUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
-import com.sean.android.pedometer.model.Penometer;
+import com.sean.android.pedometer.model.Pedometer;
 import com.sean.android.pedometer.service.PedometerService;
 
 import java.text.NumberFormat;
@@ -48,7 +48,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
+import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
 
 /**
  *
@@ -239,7 +239,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
 
         int stepsToday = Math.max(todayOffset + sinceBoot, 0);
 
-        float footSize = preferencesManager.getPrefFloatData(Penometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
+        float footSize = preferencesManager.getPrefFloatData(Pedometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
         float distanceToday = stepsToday * footSize;
         stepTextView.setText(formatter.format(stepsToday));
         distanceTextView.setText(DistanceUtil.convertDistanceMeter(distanceToday));

@@ -8,7 +8,7 @@ import com.sean.android.pedometer.base.util.SharedPreferencesManager;
  * Created by sean on 2017. 1. 14..
  */
 
-public class PenometerApplication extends Application {
+public class PedometerApplication extends Application {
 
     @Override
     public void onCreate() {

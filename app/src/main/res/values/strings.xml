@@ -19,6 +19,9 @@
     <!-- Naver Map Client ID-->
     <string name="naver_map_client_id">c5Bb9kADIXfe4FQwQL3z</string>
 
+    <!-- Content Provider Authority -->
+    <string name="content_authority">com.sean.android.pedometer</string>
+
     <!-- Permission Check -->
     <string name="permission_denied_message">Denied Permission</string>
 

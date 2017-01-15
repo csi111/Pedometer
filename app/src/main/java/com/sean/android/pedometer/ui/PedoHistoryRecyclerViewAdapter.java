@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.sean.android.pedometer.R;
 import com.sean.android.pedometer.base.util.DistanceUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
-import com.sean.android.pedometer.model.Penometer;
+import com.sean.android.pedometer.model.Pedometer;
 import com.sean.android.pedometer.model.Record;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class PedoHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PedoHis
         holder.stepCountTextView.setText(String.valueOf(record.getSteps()));
 
 
-        float footSize = SharedPreferencesManager.getInstance().getPrefFloatData(Penometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
+        float footSize = SharedPreferencesManager.getInstance().getPrefFloatData(Pedometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
         float distanceToday = record.getSteps() * footSize;
         holder.distanceTextView.setText(DistanceUtil.convertDistanceMeter(distanceToday));
     }

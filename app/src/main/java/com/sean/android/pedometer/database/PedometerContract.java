@@ -1,5 +1,6 @@
 package com.sean.android.pedometer.database;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
@@ -11,6 +12,15 @@ public class PedometerContract implements BaseColumns {
     public final static String TABLE_NAME = "PedometerSteps";
     public final static String COLUMN_DATE = "date";
     public final static String COLUMN_STEPS = "steps";
+
+    public final static String CONTENT_AUTHORITY = "com.sean.android.pedometer";
+
+    public static final String CONTENT_TYPE = "vnd.android.cursor.item/vnd.pedometer.record";
+    public static final String CONTENT_TYPE_STEP = "vnd.android.cursor.item/vnd.pedometer.step";
+
+    public final static Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+    public static final String PATH_PENOMETER = "penometer";
 
 
     static final String SQL_CREATE_STEPS_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +

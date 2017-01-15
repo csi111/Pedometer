@@ -1,16 +1,16 @@
 package com.sean.android.pedometer.service;
 
+import android.annotation.TargetApi;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-
-import java.util.ArrayList;
+import android.os.Build;
 
 /**
  * Created by sean on 2017. 1. 15..
  */
 
-public class StepCountDetector extends StepSensorDetector{
+@TargetApi(Build.VERSION_CODES.KITKAT)
+public class StepCountDetector extends AbsStepSensorDetector {
 
 
     @Override

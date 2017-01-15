@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 public class Record {
     private long date;
     private int steps;
-    private int pauseStep;
     private String dateStr;
 
 
@@ -43,15 +42,6 @@ public class Record {
         this.steps = steps;
     }
 
-
-    public int getPauseStep() {
-        return pauseStep;
-    }
-
-    public void setPauseStep(int pauseStep) {
-        this.pauseStep = pauseStep;
-    }
-
     public String getDateStr() {
         return dateStr;
     }
@@ -65,7 +55,6 @@ public class Record {
         return "Record{" +
                 "date=" + date +
                 ", steps=" + steps +
-                ", pauseStep=" + pauseStep +
                 ", dateStr='" + dateStr + '\'' +
                 '}';
     }
