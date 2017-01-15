@@ -36,7 +36,6 @@ import com.sean.android.pedometer.base.BaseFragment;
 import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.DistanceUtil;
-import com.sean.android.pedometer.base.util.LocationUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
 import com.sean.android.pedometer.model.Penometer;
@@ -58,7 +57,11 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
 
     public static final int NAVER_MAP_SCALE_LEVEL = 12;
     public final static float DEFAULT_STEP_SIZE = Locale.getDefault() == Locale.US ? 2.5f : 75f;
-    final static String DEFAULT_STEP_UNIT = Locale.getDefault() == Locale.US ? "ft" : "cm";
+    public static final int LOCATION_UPDATE_INTERVAL_MILLIS = 10000; // 변경 추척
+
+    public static final int LOCATION_UPDATE_DISTANCE = 3; // 변경 추적 범위 (meter)
+    public static final long RETAIN_GPS_MILLIS = 600000L; // gps 위치 보존 시간
+    public static final long LOCATION_FIND_TIMEOUT = 10000; // TimeOut
 
     public final static NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
 
@@ -80,8 +83,6 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
     private NMapView nMapView;
     private int todayOffset;
     private int sinceBoot;
-
-    private boolean showSteps = true;
 
     private SharedPreferencesManager preferencesManager;
 
@@ -110,8 +111,8 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         super.onCreate(savedInstanceState);
         preferencesManager = SharedPreferencesManager.getInstance();
         nMapLocationManager = new NMapLocationManager(getContext());
-        nMapLocationManager.setStartTimeout(LocationUtil.LOCATION_FIND_TIMEOUT);
-        nMapLocationManager.setUpdateFrequency(LocationUtil.LOCATION_UPDATE_INTERVAL_MILLIS, LocationUtil.LOCATION_UPDATE_DISTANCE);
+        nMapLocationManager.setStartTimeout(LOCATION_FIND_TIMEOUT);
+        nMapLocationManager.setUpdateFrequency(LOCATION_UPDATE_INTERVAL_MILLIS, LOCATION_UPDATE_DISTANCE);
         nMapLocationManager.setOnLocationChangeListener(this);
         nMapContext = new NMapContext(getContext());
         nMapContext.onCreate();

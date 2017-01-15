@@ -12,6 +12,9 @@
     tools:showIn="@layout/activity_statistics">
 
 
+
+
+
     <TextView
         android:id="@+id/step_textview"
         style="@style/AppTheme.PenometerBigTextStyle"

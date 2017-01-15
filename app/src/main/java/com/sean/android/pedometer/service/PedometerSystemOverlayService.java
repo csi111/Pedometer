@@ -18,6 +18,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -133,15 +134,14 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
         ButterKnife.bind(this, overlayMiniView);
 
         overlayMiniView.setOnTouchListener(this);
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams((int) getResources().getDimension(R.dimen.overlayview_width),
+                ViewGroup.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
-
         params.gravity = Gravity.LEFT | Gravity.TOP;
-        params.x = 0;
-        params.y = 0;
+        params.x = 50;
+        params.y = 50;
 
 
         windowManager.addView(overlayMiniView, params);

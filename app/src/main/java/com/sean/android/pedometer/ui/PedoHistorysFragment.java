@@ -23,12 +23,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
 public class PedoHistorysFragment extends BaseFragment {
 
     private int mColumnCount = 1;
@@ -40,7 +34,6 @@ public class PedoHistorysFragment extends BaseFragment {
     @BindView(R.id.pedometer_history_recyclerview)
     RecyclerView recyclerView;
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static Fragment newInstance(Context context, String title) {
         Bundle args = new Bundle();
@@ -88,11 +81,9 @@ public class PedoHistorysFragment extends BaseFragment {
         Logger.debug("onResume");
         PedometerDBHelper db = PedometerDBHelper.getInstance(getActivity());
         records.clear();
-        records.addAll(db.getTotalRecord());
+        records.addAll(db.getTotalHistoryRecord());
         Logger.debug(records.toString());
-
         db.close();
-
         recyclerView.getAdapter().notifyDataSetChanged();
 
     }
@@ -113,16 +104,7 @@ public class PedoHistorysFragment extends BaseFragment {
         super.onDetach();
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Record item);

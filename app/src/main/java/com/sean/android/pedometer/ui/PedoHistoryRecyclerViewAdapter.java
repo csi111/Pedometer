@@ -8,12 +8,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sean.android.pedometer.R;
+import com.sean.android.pedometer.base.util.DistanceUtil;
+import com.sean.android.pedometer.base.util.SharedPreferencesManager;
+import com.sean.android.pedometer.model.Penometer;
 import com.sean.android.pedometer.model.Record;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.sean.android.pedometer.ui.StatisticsFragment.DEFAULT_STEP_SIZE;
 
 public class PedoHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PedoHistoryRecyclerViewAdapter.ViewHolder> {
 
@@ -37,20 +42,11 @@ public class PedoHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PedoHis
 
         holder.dateTextView.setText(record.getDateString());
         holder.stepCountTextView.setText(String.valueOf(record.getSteps()));
-//        holder.mItem = records.get(position);
-//        holder.mIdView.setText(records.get(position).id);
-//        holder.mContentView.setText(records.get(position).content);
-//
-//        holder.mView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (null != mListener) {
-//                    // Notify the active callbacks interface (the activity, if the
-//                    // fragment is attached to one) that an item has been selected.
-//                    mListener.onListFragmentInteraction(holder.mItem);
-//                }
-//            }
-//        });
+
+
+        float footSize = SharedPreferencesManager.getInstance().getPrefFloatData(Penometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
+        float distanceToday = record.getSteps() * footSize;
+        holder.distanceTextView.setText(DistanceUtil.convertDistanceMeter(distanceToday));
     }
 
     @Override

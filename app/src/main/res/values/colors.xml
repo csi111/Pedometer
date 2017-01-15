@@ -13,4 +13,6 @@
     <color name="colorMainTabDisableText">#c8c8c8</color>
     <color name="colorMainTabIndicator">#ff3800</color>
 
+    <color name="colorOverlayViewBackground">#c0ffffff</color>
+
 </resources>
