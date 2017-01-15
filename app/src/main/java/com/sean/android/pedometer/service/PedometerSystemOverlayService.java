@@ -36,8 +36,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
-import static com.sean.android.pedometer.ui.StatisticsFragment.DEFAULT_STEP_SIZE;
-import static com.sean.android.pedometer.ui.StatisticsFragment.formatter;
+import static com.sean.android.pedometer.ui.PedoStatisticsFragment.DEFAULT_STEP_SIZE;
+import static com.sean.android.pedometer.ui.PedoStatisticsFragment.formatter;
 
 /**
  * Created by sean on 2017. 1. 15..

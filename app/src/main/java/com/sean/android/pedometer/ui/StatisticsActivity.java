@@ -34,7 +34,7 @@ public class StatisticsActivity extends AppCompatActivity implements PermissionL
     Toolbar toolbar;
 
 
-    private StatisticsFragment statisticsFragment;
+    private PedoStatisticsFragment statisticsFragment;
     private PedoHistorysFragment pedoHistorysFragment;
 
     @Override
@@ -81,7 +81,7 @@ public class StatisticsActivity extends AppCompatActivity implements PermissionL
     private List<Fragment> createTabFragments() {
         List<Fragment> tabFragments = new ArrayList<>();
 
-        statisticsFragment = (StatisticsFragment) StatisticsFragment.newInstance(this, getString(R.string.title_pedometer_status));
+        statisticsFragment = (PedoStatisticsFragment) PedoStatisticsFragment.newInstance(this, getString(R.string.title_pedometer_status));
         pedoHistorysFragment = (PedoHistorysFragment) PedoHistorysFragment.newInstance(this, getString(R.string.title_pedometer_history));
         tabFragments.add(statisticsFragment);
         tabFragments.add(pedoHistorysFragment);

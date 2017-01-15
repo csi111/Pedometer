@@ -52,7 +52,7 @@ import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
 /**
  *
  */
-public class StatisticsFragment extends BaseFragment implements SensorEventListener, NMapLocationManager.OnLocationChangeListener, NMapActivity.OnDataProviderListener {
+public class PedoStatisticsFragment extends BaseFragment implements SensorEventListener, NMapLocationManager.OnLocationChangeListener, NMapActivity.OnDataProviderListener {
 
     public static final int NAVER_MAP_SCALE_LEVEL = 12;
     public final static float DEFAULT_STEP_SIZE = Locale.getDefault() == Locale.US ? 2.5f : 75f;
@@ -92,7 +92,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
     public static Fragment newInstance(Context context, String title) {
         Bundle args = new Bundle();
         args.putString(TITLE_PARAM, title);
-        return Fragment.instantiate(context, StatisticsFragment.class.getName(), args);
+        return Fragment.instantiate(context, PedoStatisticsFragment.class.getName(), args);
     }
 
     @Override

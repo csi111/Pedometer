@@ -18,7 +18,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.sean.android.pedometer.ui.StatisticsFragment.DEFAULT_STEP_SIZE;
+import static com.sean.android.pedometer.ui.PedoStatisticsFragment.DEFAULT_STEP_SIZE;
 
 public class PedoHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PedoHistoryRecyclerViewAdapter.ViewHolder> {
 
