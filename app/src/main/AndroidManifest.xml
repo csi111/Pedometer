@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
 <application
         android:name=".PenometerApplication"
@@ -42,7 +43,11 @@
     </receiver>
 
     <service
-        android:name=".service.PenometerService"/>
+        android:name=".service.PedometerService"/>
+
+    <service
+        android:name=".service.PedometerSystemOverlayService"
+        android:exported="false" />
 
     <receiver
         android:name=".broadcastreceiver.ShutdownRecevier">

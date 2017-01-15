@@ -43,6 +43,10 @@
         <item name="android:textSize">@dimen/default_big_text_size</item>
     </style>
 
+    <style name="AppTheme.PenometerLittleBigTextStyle" parent="AppTheme.PenometerTextStyle">
+        <item name="android:textSize">@dimen/default_little_big_text_size</item>
+    </style>
+
     <style name="AppTheme.PenometerButtonStyle" parent="android:Widget.Button">
         <item name="android:textSize">@dimen/default_text_size</item>
         <item name="android:textColor">@color/colorAccent</item>

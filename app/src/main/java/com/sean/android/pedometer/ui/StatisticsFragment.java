@@ -1,34 +1,38 @@
 package com.sean.android.pedometer.ui;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.nhn.android.maps.NMapActivity;
 import com.nhn.android.maps.NMapContext;
 import com.nhn.android.maps.NMapController;
 import com.nhn.android.maps.NMapLocationManager;
 import com.nhn.android.maps.NMapView;
 import com.nhn.android.maps.maplib.NGeoPoint;
-import com.nhn.android.maps.maplib.NMapConverter;
 import com.nhn.android.maps.nmapmodel.NMapError;
 import com.nhn.android.maps.nmapmodel.NMapPlacemark;
 import com.sean.android.pedometer.R;
@@ -38,23 +42,25 @@ import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.DistanceUtil;
 import com.sean.android.pedometer.base.util.LocationUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
-import com.sean.android.pedometer.database.PenometerDBHelper;
+import com.sean.android.pedometer.database.PedometerDBHelper;
 import com.sean.android.pedometer.model.Penometer;
-import com.sean.android.pedometer.service.PenometerService;
+import com.sean.android.pedometer.service.PedometerService;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.gun0912.tedpermission.TedPermissionActivity.REQ_CODE_PERMISSION_REQUEST;
 import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
 
 /**
  *
  */
-public class StatisticsFragment extends BaseFragment implements SensorEventListener, ServiceConnection, NMapLocationManager.OnLocationChangeListener, NMapActivity.OnDataProviderListener {
+ public class StatisticsFragment extends BaseFragment implements SensorEventListener, ServiceConnection, NMapLocationManager.OnLocationChangeListener, NMapActivity.OnDataProviderListener, PermissionListener {
 
     public static final int NAVER_MAP_SCALE_LEVEL = 12;
     final static float DEFAULT_STEP_SIZE = Locale.getDefault() == Locale.US ? 2.5f : 75f;
@@ -80,16 +86,17 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
     private NMapView nMapView;
     private int todayOffset;
     private int sinceBoot;
-
+    private int pauseStep;
     private int todaySteps;
 
+    private boolean hasLocationPermission = false;
     private boolean showSteps = true;
 
     private SharedPreferencesManager preferencesManager;
 
-    private PenometerService penometerService;
+    private PedometerService pedometerService;
 
-    private PenometerService.StepCallback stepCallback;
+    private PedometerService.StepCallback stepCallback;
 
     private NMapLocationManager nMapLocationManager;
 
@@ -119,7 +126,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         nMapContext.onCreate();
         nMapContext.setMapDataProviderListener(this);
 
-        stepCallback = new PenometerService.StepCallback() {
+        stepCallback = new PedometerService.StepCallback() {
             @Override
             public void onStep(int value) {
                 Logger.debug("onStep Value = [" + value + "]");
@@ -144,8 +151,10 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
     @Override
     public void onStart() {
         super.onStart();
-        nMapLocationManager.enableMyLocation(false);
         nMapContext.onStart();
+        if(checkLocationPermission()) {
+            nMapLocationManager.enableMyLocation(false);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -153,16 +162,13 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
     public void onResume() {
         super.onResume();
         nMapContext.onResume();
-//        bindPenometerService();
 
-        PenometerDBHelper db = PenometerDBHelper.getInstance(getActivity());
-
+        PedometerDBHelper db = PedometerDBHelper.getInstance(getActivity());
         todayOffset = db.getSteps(CalendarUtil.getTodayMills());
 
         sinceBoot = db.getCurrentSteps(); // do not use the value from the sharedPreferences
+        pauseStep = db.getCurrentPauseSteps();
         int pauseDifference = sinceBoot - preferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY, sinceBoot);
-
-        todaySteps -= pauseDifference;
 
         if (!checkResumeState()) {
             SensorManager sm =
@@ -175,8 +181,13 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         }
 
         sinceBoot -= pauseDifference;
+        sinceBoot += pauseStep;
 
         db.close();
+
+        Logger.debug("todayOffset : " + todayOffset + "sinceBoot : " + sinceBoot + "pauseStep :" + pauseStep + "pauseDifference :" + pauseDifference);
+
+        todaySteps = Math.max(todayOffset + sinceBoot + pauseStep, 0);
 
         updatePenometerData();
     }
@@ -184,6 +195,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
     @Override
     public void onPause() {
         super.onPause();
+        if(checkLocationPermission())
         nMapContext.onPause();
         try {
             SensorManager sm =
@@ -192,7 +204,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         } catch (Exception e) {
             e.printStackTrace();
         }
-        PenometerDBHelper db = PenometerDBHelper.getInstance(getActivity());
+        PedometerDBHelper db = PedometerDBHelper.getInstance(getActivity());
         db.saveCurrentSteps(sinceBoot);
         db.close();
     }
@@ -230,6 +242,9 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @OnClick(R.id.pause_button)
     public void actionPause(View view) {
+        getContext().startService(new Intent(getActivity(), PedometerService.class)
+                .putExtra("action", PedometerService.ACTION_PAUSE));
+
         SensorManager sm = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         if (checkResumeState()) {
             sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
@@ -242,8 +257,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
             pauseButton.setText(getString(R.string.action_penometer_start));
             pauseButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         }
-        getContext().startService(new Intent(getActivity(), PenometerService.class)
-                .putExtra("action", PenometerService.ACTION_PAUSE));
+
     }
 
     private void updatePenometerData() {
@@ -257,8 +271,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Logger.debug("UI - sensorChanged | todayOffset: " + todayOffset + " since boot: " +
-                event.values[0]);
+        Logger.debug("UI - sensorChanged | todayOffset: " + todayOffset + " since boot: " + event.values[0] + " pauseStep: " + pauseStep);
         if (event.values[0] > Integer.MAX_VALUE || event.values[0] == 0) {
             return;
         }
@@ -267,13 +280,13 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
             // we dont know when the reboot was, so set todays steps to 0 by
             // initializing them with -STEPS_SINCE_BOOT
             todayOffset = -(int) event.values[0];
-            PenometerDBHelper db = PenometerDBHelper.getInstance(getActivity());
+            PedometerDBHelper db = PedometerDBHelper.getInstance(getActivity());
             db.insertNewDay(CalendarUtil.getTodayMills(), (int) event.values[0]);
             db.close();
         }
         sinceBoot = (int) event.values[0];
 
-        todaySteps = Math.max(sinceBoot + todayOffset, 0);
+        todaySteps = Math.max(sinceBoot + todayOffset + pauseStep, 0);
 
         updatePenometerData();
     }
@@ -285,17 +298,17 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        penometerService = ((PenometerService.ServiceBinder) service).getService();
-        penometerService.setStepCallback(stepCallback);
+        pedometerService = ((PedometerService.ServiceBinder) service).getService();
+        pedometerService.setStepCallback(stepCallback);
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        penometerService = null;
+        pedometerService = null;
     }
 
     private void bindPenometerService() {
-        getActivity().bindService(new Intent(getActivity(), PenometerService.class), this, Context.BIND_AUTO_CREATE + Context.BIND_DEBUG_UNBIND);
+        getActivity().bindService(new Intent(getActivity(), PedometerService.class), this, Context.BIND_AUTO_CREATE + Context.BIND_DEBUG_UNBIND);
     }
 
     private void unbindPenometerService() {
@@ -417,5 +430,31 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         }
     }
 
+
+    private boolean checkLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    return true;
+            }
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQ_CODE_PERMISSION_REQUEST);
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onPermissionGranted() {
+        Toast.makeText(getContext(), "onPermissionGranted", Toast.LENGTH_SHORT).show();
+        hasLocationPermission = true;
+    }
+
+    @Override
+    public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+        Toast.makeText(getContext(), "onPermissionDenied\n" + deniedPermissions.toString() , Toast.LENGTH_SHORT).show();
+        hasLocationPermission = false;
+
+    }
 
 }

@@ -21,14 +21,14 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.sean.android.pedometer.base.Logger;
-import com.sean.android.pedometer.service.PenometerService;
+import com.sean.android.pedometer.service.PedometerService;
 
 public class AppUpdatedReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(final Context context, final Intent intent) {
 			Logger.debug("app updated");
-		context.startService(new Intent(context, PenometerService.class));
+		context.startService(new Intent(context, PedometerService.class));
 	}
 
 }

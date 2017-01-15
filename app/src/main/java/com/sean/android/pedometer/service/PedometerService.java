@@ -32,13 +32,13 @@ import com.sean.android.pedometer.BuildConfig;
 import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
-import com.sean.android.pedometer.database.PenometerDBHelper;
+import com.sean.android.pedometer.database.PedometerDBHelper;
 import com.sean.android.pedometer.model.Penometer;
 
 import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
 
 
-public class PenometerService extends Service implements StepListener {
+public class PedometerService extends Service implements StepListener {
 
     public final static String ACTION_PAUSE = "pause";
 
@@ -53,10 +53,6 @@ public class PenometerService extends Service implements StepListener {
 
     private IBinder serviceBinder = new ServiceBinder();
 
-    private int todayoffset; //Service 시작전 DB상에 저장된 오늘 기록
-    private int sinceBoot; // From 00:00 ~ 현재까지 기록된 Step Count
-    private int todaySteps; //Service 시작 이후부터 저장되고 있는 기록
-
     @Override
     public IBinder onBind(final Intent intent) {
         Logger.debug("IBinder onBind");
@@ -68,19 +64,19 @@ public class PenometerService extends Service implements StepListener {
         Logger.debug("onStartCommand action");
         if (intent != null && ACTION_PAUSE.equals(intent.getStringExtra("action"))) {
             Logger.debug("onStartCommand action: " + intent.getStringExtra("action"));
-            PenometerDBHelper db = PenometerDBHelper.getInstance(this);
-            sinceBoot = db.getCurrentSteps();
+            PedometerDBHelper db = PedometerDBHelper.getInstance(this);
 
             if (sharedPreferencesManager.contains(PREF_PAUSE_COUNT_KEY)) {
                 int difference = steps - sharedPreferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY);
                 db.addToLastEntry(-difference);
+                db.addToPauseStep(-difference);
                 db.close();
                 sharedPreferencesManager.removeData(PREF_PAUSE_COUNT_KEY);
             } else { // pause counting
                 // cancel restart
                 ((AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE))
                         .cancel(PendingIntent.getService(getApplicationContext(), 2,
-                                new Intent(this, PenometerService.class),
+                                new Intent(this, PedometerService.class),
                                 PendingIntent.FLAG_UPDATE_CURRENT));
                 sharedPreferencesManager.setPrefData(PREF_PAUSE_COUNT_KEY, steps);
                 stopSelf();
@@ -92,7 +88,7 @@ public class PenometerService extends Service implements StepListener {
         ((AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE))
                 .set(AlarmManager.RTC, System.currentTimeMillis() + AlarmManager.INTERVAL_HOUR,
                         PendingIntent.getService(getApplicationContext(), 2,
-                                new Intent(this, PenometerService.class),
+                                new Intent(this, PedometerService.class),
                                 PendingIntent.FLAG_UPDATE_CURRENT));
 
         WAIT_FOR_VALID_STEPS = true;
@@ -103,7 +99,7 @@ public class PenometerService extends Service implements StepListener {
     @Override
     public void onCreate() {
         super.onCreate();
-        Logger.debug("SensorListener onCreate");
+        Logger.debug("PedometerService onCreate");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             stepDetector = new StepCountDetector();
@@ -113,17 +109,6 @@ public class PenometerService extends Service implements StepListener {
 
         stepDetector.addStepListener(this);
         sharedPreferencesManager = SharedPreferencesManager.getInstance();
-
-
-        PenometerDBHelper db = PenometerDBHelper.getInstance(this);
-        todayoffset = db.getSteps(CalendarUtil.getTodayMills());
-        sinceBoot = db.getCurrentSteps(); // do not use the value from the sharedPreferences
-
-        int pauseDifference = sinceBoot - sharedPreferencesManager.getPrefIntegerData(Penometer.PREF_PAUSE_COUNT_KEY, sinceBoot);
-
-        todaySteps = Math.max(todayoffset + sinceBoot, 0);
-
-        Logger.debug("todayoffset : " + todayoffset + " sinceBoot : " + sinceBoot + "todaySteps =" + todaySteps + " pauseDifference :" + pauseDifference);
 
         reRegisterSensor();
     }
@@ -135,7 +120,7 @@ public class PenometerService extends Service implements StepListener {
         // Restart service in 500 ms
         ((AlarmManager) getSystemService(Context.ALARM_SERVICE))
                 .set(AlarmManager.RTC, System.currentTimeMillis() + 500, PendingIntent
-                        .getService(this, 3, new Intent(this, PenometerService.class), 0));
+                        .getService(this, 3, new Intent(this, PedometerService.class), 0));
     }
 
     @Override
@@ -185,7 +170,7 @@ public class PenometerService extends Service implements StepListener {
             steps = (int) stepValue;
             if (WAIT_FOR_VALID_STEPS && steps > 0) {
                 WAIT_FOR_VALID_STEPS = false;
-                PenometerDBHelper db = PenometerDBHelper.getInstance(this);
+                PedometerDBHelper db = PedometerDBHelper.getInstance(this);
                 if (db.getSteps(CalendarUtil.getTodayMills()) == Integer.MIN_VALUE) {
                     int pauseDifference = steps - sharedPreferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY, steps);
 
@@ -210,7 +195,7 @@ public class PenometerService extends Service implements StepListener {
 //        steps++;
 //        if (WAIT_FOR_VALID_STEPS && steps > 0) {
 //            WAIT_FOR_VALID_STEPS = false;
-//            PenometerDBHelper db = PenometerDBHelper.getInstance(this);
+//            PedometerDBHelper db = PedometerDBHelper.getInstance(this);
 //            if (db.getSteps(CalendarUtil.getTodayMills()) == Integer.MIN_VALUE) {
 //                int pauseDifference = steps - sharedPreferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY, steps);
 //                db.insertNewDay(CalendarUtil.getTodayMills(), steps - pauseDifference);
@@ -235,8 +220,8 @@ public class PenometerService extends Service implements StepListener {
     }
 
     public class ServiceBinder extends Binder {
-        public PenometerService getService() {
-            return PenometerService.this;
+        public PedometerService getService() {
+            return PedometerService.this;
         }
     }
 

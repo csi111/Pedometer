@@ -26,30 +26,36 @@ import android.util.Pair;
 import com.sean.android.pedometer.BuildConfig;
 import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.CalendarUtil;
+import com.sean.android.pedometer.model.Record;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.sean.android.pedometer.database.PedometerContract.*;
 
-public class PenometerDBHelper extends SQLiteOpenHelper {
 
-    private final static String DB_NAME = "Penometer";
+public class PedometerDBHelper extends SQLiteOpenHelper {
+
+    private final static String DB_NAME = "Pedometer";
     private final static int DB_VERSION = 1;
 
-    private volatile static PenometerDBHelper dbHelper;
+
+
+
+    private volatile static PedometerDBHelper dbHelper;
     private static final AtomicInteger openCounter = new AtomicInteger();
 
-    private PenometerDBHelper(final Context context) {
+    private PedometerDBHelper(final Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
-    public static PenometerDBHelper getInstance(final Context c) {
+    public static PedometerDBHelper getInstance(final Context c) {
         if (dbHelper == null) {
-            synchronized (PenometerDBHelper.class) {
+            synchronized (PedometerDBHelper.class) {
                 if(dbHelper == null) {
-                    dbHelper = new PenometerDBHelper(c.getApplicationContext());
+                    dbHelper = new PedometerDBHelper(c.getApplicationContext());
                 }
             }
         }
@@ -66,18 +72,18 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(final SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + DB_NAME + " (date INTEGER, steps INTEGER)");
+        db.execSQL(PedometerContract.SQL_CREATE_STEPS_TABLE);
+
     }
 
     @Override
     public void onUpgrade(final SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion == 1) {
+        if (newVersion > oldVersion ) {
             // drop PRIMARY KEY constraint
-            db.execSQL("CREATE TABLE " + DB_NAME + "2 (date INTEGER, steps INTEGER)");
-            db.execSQL("INSERT INTO " + DB_NAME + "2 (date, steps) SELECT date, steps FROM " +
-                    DB_NAME);
-            db.execSQL("DROP TABLE " + DB_NAME);
-            db.execSQL("ALTER TABLE " + DB_NAME + "2 RENAME TO " + DB_NAME + "");
+            db.execSQL(SQL_CREATE_STEPS_BACKUP_TABLE);
+            db.execSQL(SQL_BACKUP_DATA_INSERT);
+            db.execSQL(SQL_DROP_TABLE);
+            db.execSQL(SQL_BACKUP_TABLE_RENAME);
         }
     }
 
@@ -96,26 +102,28 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
                         final String[] selectionArgs, final String groupBy, final String having,
                         final String orderBy, final String limit) {
         return getReadableDatabase()
-                .query(DB_NAME, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
+                .query(TABLE_NAME, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 
 
     public void insertNewDay(long date, int steps) {
         getWritableDatabase().beginTransaction();
         try {
-            Cursor c = getReadableDatabase().query(DB_NAME, new String[]{"date"}, "date = ?",
+            Cursor c = getReadableDatabase().query(TABLE_NAME, new String[]{COLUMN_DATE}, COLUMN_DATE +" = ?",
                     new String[]{String.valueOf(date)}, null, null, null);
             if (c.getCount() == 0 && steps >= 0) {
 
                 // add 'steps' to yesterdays count
                 addToLastEntry(steps);
+                addToPauseStep(0);
 
                 // add today
                 ContentValues values = new ContentValues();
-                values.put("date", date);
+                values.put(COLUMN_DATE, date);
                 // use the negative steps as offset
-                values.put("steps", -steps);
-                getWritableDatabase().insert(DB_NAME, null, values);
+                values.put(COLUMN_STEPS, -steps);
+                values.put(COLUMN_PAUSE_STEPS, 0);
+                getWritableDatabase().insert(TABLE_NAME, null, values);
             }
             c.close();
             Logger.debug("insertDay " + date + " / " + steps);
@@ -133,9 +141,19 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
      * @param steps the number of steps to add. Must be > 0
      */
     public void addToLastEntry(int steps) {
+        Logger.debug("addToLastEntry() Steps = [" + steps +"]");
         if (steps > 0) {
-            getWritableDatabase().execSQL("UPDATE " + DB_NAME + " SET steps = steps + " + steps +
-                    " WHERE date = (SELECT MAX(date) FROM " + DB_NAME + ")");
+            getWritableDatabase().execSQL(SQL_ADD_LAST_ENTRY, new String[]{String.valueOf(steps)});
+//            getWritableDatabase().execSQL("UPDATE " + DB_NAME + " SET steps = steps + " + steps +
+//                    " WHERE date = (SELECT MAX(date) FROM " + DB_NAME + ")");
+        }
+    }
+    public void addToPauseStep(int steps) {
+        Logger.debug("addToPauseStep() Steps = [" + steps +"]");
+        if (steps > 0) {
+            getWritableDatabase().execSQL(SQL_ADD_PAUSE_STEP, new String[]{String.valueOf(steps)});
+//            getWritableDatabase().execSQL("UPDATE " + DB_NAME + " SET steps = steps + " + steps +
+//                    " WHERE date = (SELECT MAX(date) FROM " + DB_NAME + ")");
         }
     }
 
@@ -154,14 +172,14 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
         getWritableDatabase().beginTransaction();
         boolean re;
         try {
-            Cursor c = getReadableDatabase().query(DB_NAME, new String[]{"date"}, "date = ?",
+            Cursor c = getReadableDatabase().query(TABLE_NAME, new String[]{"date"}, "date = ?",
                     new String[]{String.valueOf(date)}, null, null, null);
             re = c.getCount() == 0 && steps >= 0;
             if (re) {
                 ContentValues values = new ContentValues();
                 values.put("date", date);
                 values.put("steps", steps);
-                getWritableDatabase().insert(DB_NAME, null, values);
+                getWritableDatabase().insert(TABLE_NAME, null, values);
             }
             c.close();
             getWritableDatabase().setTransactionSuccessful();
@@ -177,7 +195,7 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
     public void logState() {
         if (BuildConfig.DEBUG) {
             Cursor c = getReadableDatabase()
-                    .query(DB_NAME, null, null, null, null, null, "date DESC", "5");
+                    .query(TABLE_NAME, null, null, null, null, null, "date DESC", "5");
             Logger.debug(c);
             c.close();
         }
@@ -190,12 +208,43 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
      */
     public int getTotalWithoutToday() {
         Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"SUM(steps)"}, "steps > 0 AND date > 0 AND date < ?",
+                .query(TABLE_NAME, new String[]{"SUM(steps)"}, "steps > 0 AND date > 0 AND date < ?",
                         new String[]{String.valueOf(CalendarUtil.getTodayMills())}, null, null, null);
         c.moveToFirst();
         int re = c.getInt(0);
         c.close();
         return re;
+    }
+
+    public List<Record> getTotalHistoryRecord() {
+        Cursor cursor = query(new String[]{COLUMN_DATE, COLUMN_STEPS}, COLUMN_STEPS +" > -1 AND " + COLUMN_DATE + " > 0 AND " + COLUMN_DATE +" < ?", new String[]{String.valueOf(CalendarUtil.getTodayMills())}, null, null, "date ASC", null);
+
+        List<Record> records = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                records.add(new Record(cursor.getLong(0), cursor.getInt(1)));
+            } while (cursor.moveToNext());
+        }
+
+        return records;
+    }
+
+    public List<Record> getTotalRecord() {
+        Cursor cursor = query(new String[]{COLUMN_DATE, COLUMN_STEPS, COLUMN_PAUSE_STEPS}, null, null, null, null, "date ASC", null);
+
+        List<Record> records = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Record record = new Record(cursor.getLong(0), cursor.getInt(1));
+                record.setPauseStep(cursor.getInt(2));
+                records.add(record);
+
+            } while (cursor.moveToNext());
+        }
+
+        return records;
     }
 
     /**
@@ -205,7 +254,7 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
      */
     public int getRecord() {
         Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"MAX(steps)"}, "date > 0", null, null, null, null);
+                .query(TABLE_NAME, new String[]{"MAX(steps)"}, "date > 0", null, null, null, null);
         c.moveToFirst();
         int re = c.getInt(0);
         c.close();
@@ -218,9 +267,9 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
      * @return a pair containing the date (Date) in millis since 1970 and the
      * step value (Integer)
      */
-    public Pair<Date, Integer> getRecordData() {
+    public Pair<Date, Integer> getBestRecordData() {
         Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"date, steps"}, "date > 0", null, null, null,
+                .query(TABLE_NAME, new String[]{"date, steps"}, "date > 0", null, null, null,
                         "steps DESC", "1");
         c.moveToFirst();
         Pair<Date, Integer> p = new Pair<Date, Integer>(new Date(c.getLong(0)), c.getInt(1));
@@ -239,20 +288,39 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
      * exist in the database
      */
     public int getSteps(final long date) {
-        Cursor c = getReadableDatabase().query(DB_NAME, new String[]{"steps"}, "date = ?",
+        Cursor c = getReadableDatabase().query(TABLE_NAME, new String[]{COLUMN_STEPS}, "date = ?",
                 new String[]{String.valueOf(date)}, null, null, null);
         c.moveToFirst();
-        int re;
-        if (c.getCount() == 0) re = Integer.MIN_VALUE;
-        else re = c.getInt(0);
+        int step;
+        if (c.getCount() == 0) {
+            step = Integer.MIN_VALUE;
+        }
+        else {
+            step = c.getInt(0);
+        }
         c.close();
-        return re;
+        return step;
+    }
+
+    public int getPauseSteps(final long date) {
+        Cursor c = getReadableDatabase().query(TABLE_NAME, new String[]{COLUMN_PAUSE_STEPS}, "date = ?",
+                new String[]{String.valueOf(date)}, null, null, null);
+        c.moveToFirst();
+        int step;
+        if (c.getCount() == 0) {
+            step = Integer.MIN_VALUE;
+        }
+        else {
+            step = c.getInt(0);
+        }
+        c.close();
+        return step;
     }
 
 
     public List<Pair<Long, Integer>> getLastEntries(int num) {
         Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"date", "steps"}, "date > 0", null, null, null,
+                .query(TABLE_NAME, new String[]{"date", "steps"}, "date > 0", null, null, null,
                         "date DESC", String.valueOf(num));
         int max = c.getCount();
         List<Pair<Long, Integer>> result = new ArrayList<>(max);
@@ -267,7 +335,7 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
 
     public int getSteps(final long start, final long end) {
         Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"SUM(steps)"}, "date >= ? AND date <= ?",
+                .query(TABLE_NAME, new String[]{"SUM(steps)"}, "date >= ? AND date <= ?",
                         new String[]{String.valueOf(start), String.valueOf(end)}, null, null, null);
         int re;
         if (c.getCount() == 0) {
@@ -282,17 +350,17 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
 
 
     public void removeNegativeEntries() {
-        getWritableDatabase().delete(DB_NAME, "steps < ?", new String[]{"0"});
+        getWritableDatabase().delete(TABLE_NAME, COLUMN_STEPS + "< ?", new String[]{"0"});
     }
 
 
     public void removeInvalidEntries() {
-        getWritableDatabase().delete(DB_NAME, "steps >= ?", new String[]{"200000"});
+        getWritableDatabase().delete(TABLE_NAME, "steps >= ?", new String[]{"200000"});
     }
 
     public int getDays() {
         Cursor c = getReadableDatabase()
-                .query(DB_NAME, new String[]{"COUNT(*)"}, "steps > ? AND date < ? AND date > 0",
+                .query(TABLE_NAME, new String[]{"COUNT(*)"}, COLUMN_STEPS + " > ? AND " + COLUMN_DATE + " < ? AND " + COLUMN_DATE +"> 0",
                         new String[]{String.valueOf(0), String.valueOf(CalendarUtil.getTodayMills())}, null,
                         null, null);
         c.moveToFirst();
@@ -305,16 +373,21 @@ public class PenometerDBHelper extends SQLiteOpenHelper {
 
     public void saveCurrentSteps(int steps) {
         ContentValues values = new ContentValues();
-        values.put("steps", steps);
-        if (getWritableDatabase().update(DB_NAME, values, "date = -1", null) == 0) {
-            values.put("date", -1);
-            getWritableDatabase().insert(DB_NAME, null, values);
+        values.put(COLUMN_STEPS, steps);
+        if (getWritableDatabase().update(TABLE_NAME, values, COLUMN_DATE +" = -1", null) == 0) {
+            values.put(COLUMN_STEPS, -1);
+            getWritableDatabase().insert(TABLE_NAME, null, values);
         }
         Logger.debug("saving steps in db: " + steps);
     }
 
     public int getCurrentSteps() {
         int re = getSteps(-1);
+        return re == Integer.MIN_VALUE ? 0 : re;
+    }
+
+    public int getCurrentPauseSteps() {
+        int re = getPauseSteps(-1);
         return re == Integer.MIN_VALUE ? 0 : re;
     }
 }

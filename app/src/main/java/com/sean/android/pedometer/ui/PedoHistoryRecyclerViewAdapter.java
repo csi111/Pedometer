@@ -8,20 +8,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sean.android.pedometer.R;
-import com.sean.android.pedometer.ui.dummy.DummyContent.DummyItem;
+import com.sean.android.pedometer.model.Record;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PenoHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PenoHistoryRecyclerViewAdapter.ViewHolder> {
+public class PedoHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PedoHistoryRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
-    private final PenoHistorysFragment.OnListFragmentInteractionListener mListener;
+    private final List<Record> records;
+    private final PedoHistorysFragment.OnListFragmentInteractionListener mListener;
 
-    public PenoHistoryRecyclerViewAdapter(List<DummyItem> items, PenoHistorysFragment.OnListFragmentInteractionListener listener) {
-        mValues = items;
+    public PedoHistoryRecyclerViewAdapter(List<Record> items, PedoHistorysFragment.OnListFragmentInteractionListener listener) {
+        records = items;
         mListener = listener;
     }
 
@@ -33,9 +33,13 @@ public class PenoHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PenoHis
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-//        holder.mItem = mValues.get(position);
-//        holder.mIdView.setText(mValues.get(position).id);
-//        holder.mContentView.setText(mValues.get(position).content);
+        Record record = records.get(position);
+
+        holder.dateTextView.setText(record.getDateString());
+        holder.stepCountTextView.setText(String.valueOf(record.getSteps()));
+//        holder.mItem = records.get(position);
+//        holder.mIdView.setText(records.get(position).id);
+//        holder.mContentView.setText(records.get(position).content);
 //
 //        holder.mView.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -51,8 +55,10 @@ public class PenoHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PenoHis
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return records.size();
     }
+
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.icon_imageview)

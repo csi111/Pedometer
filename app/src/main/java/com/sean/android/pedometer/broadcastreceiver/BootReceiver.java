@@ -22,8 +22,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.sean.android.pedometer.base.Logger;
-import com.sean.android.pedometer.database.PenometerDBHelper;
-import com.sean.android.pedometer.service.PenometerService;
+import com.sean.android.pedometer.base.util.SharedPreferencesManager;
+import com.sean.android.pedometer.database.PedometerDBHelper;
+import com.sean.android.pedometer.service.PedometerService;
 
 public class BootReceiver extends BroadcastReceiver {
 
@@ -31,11 +32,11 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
         Logger.debug("booted");
 
-        SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+        SharedPreferencesManager.getInstance().load(context);
 
-        PenometerDBHelper db = PenometerDBHelper.getInstance(context);
+        PedometerDBHelper db = PedometerDBHelper.getInstance(context);
 
-        if (!prefs.getBoolean("correctShutdown", false)) {
+        if (!SharedPreferencesManager.getInstance().getPrefBooleanData("correctShutdown", false)) {
             Logger.debug("Incorrect shutdown");
             // can we at least recover some steps?
             int steps = db.getCurrentSteps();
@@ -47,8 +48,8 @@ public class BootReceiver extends BroadcastReceiver {
         db.removeNegativeEntries();
         db.saveCurrentSteps(0);
         db.close();
-        prefs.edit().remove("correctShutdown").apply();
+        SharedPreferencesManager.getInstance().removeDataApply("correctShutdown");
 
-        context.startService(new Intent(context, PenometerService.class));
+        context.startService(new Intent(context, PedometerService.class));
     }
 }

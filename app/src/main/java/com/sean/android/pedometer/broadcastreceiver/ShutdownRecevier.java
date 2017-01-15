@@ -22,8 +22,8 @@ import android.content.Intent;
 
 import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.CalendarUtil;
-import com.sean.android.pedometer.database.PenometerDBHelper;
-import com.sean.android.pedometer.service.PenometerService;
+import com.sean.android.pedometer.database.PedometerDBHelper;
+import com.sean.android.pedometer.service.PedometerService;
 
 public class ShutdownRecevier extends BroadcastReceiver {
 
@@ -31,7 +31,7 @@ public class ShutdownRecevier extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
         Logger.debug("onReceive");
 
-        context.startService(new Intent(context, PenometerService.class));
+        context.startService(new Intent(context, PedometerService.class));
 
         // if the user used a root script for shutdown, the DEVICE_SHUTDOWN
         // broadcast might not be send. Therefore, the app will check this
@@ -40,7 +40,7 @@ public class ShutdownRecevier extends BroadcastReceiver {
         context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                 .putBoolean("correctShutdown", true).commit();
 
-        PenometerDBHelper db = PenometerDBHelper.getInstance(context);
+        PedometerDBHelper db = PedometerDBHelper.getInstance(context);
         // if it's already a new day, add the temp. steps to the last one
         if (db.getSteps(CalendarUtil.getTodayMills()) == Integer.MIN_VALUE) {
             int steps = db.getCurrentSteps();

@@ -157,6 +157,16 @@ public class SharedPreferencesManager {
         editor.commit();
     }
 
+    public void removeDataApply(String... keys) {
+        SharedPreferences.Editor editor = pref.edit();
+
+        for (String key : keys) {
+            editor.remove(key);
+        }
+
+        editor.apply();
+    }
+
     public boolean contains(String key) {
         return pref.contains(key);
     }
