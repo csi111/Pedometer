@@ -141,7 +141,6 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
     public void addToLastEntry(int steps) {
         Logger.debug("addToLastEntry() Steps = [" + steps +"]");
         if (steps > 0) {
-//            getWritableDatabase().execSQL(SQL_ADD_LAST_ENTRY, new String[]{String.valueOf(steps)});
             getWritableDatabase().execSQL("UPDATE " + TABLE_NAME+ " SET steps = steps + " + steps +
                     " WHERE date = (SELECT MAX(date) FROM " + TABLE_NAME + ")");
         }
@@ -346,8 +345,8 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
     public void saveCurrentSteps(int steps) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_STEPS, steps);
-        if (getWritableDatabase().update(TABLE_NAME, values, COLUMN_DATE +" = -1", null) == 0) {
-            values.put(COLUMN_STEPS, -1);
+        if (getWritableDatabase().update(TABLE_NAME, values, "date = -1", null) == 0) {
+            values.put(COLUMN_DATE, -1);
             getWritableDatabase().insert(TABLE_NAME, null, values);
         }
         Logger.debug("saving steps in db: " + steps);

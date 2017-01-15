@@ -64,10 +64,15 @@ public class PedometerService extends Service implements StepListener {
         Logger.debug("onStartCommand action");
         if (intent != null && ACTION_PAUSE.equals(intent.getStringExtra("action"))) {
             Logger.debug("onStartCommand action: " + intent.getStringExtra("action"));
-            PedometerDBHelper db = PedometerDBHelper.getInstance(this);
+            if (steps == 0) {
+                PedometerDBHelper db = PedometerDBHelper.getInstance(this);
+                steps = db.getCurrentSteps();
+                db.close();
+            }
 
             if (sharedPreferencesManager.contains(PREF_PAUSE_COUNT_KEY)) {
                 int difference = steps - sharedPreferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY);
+                PedometerDBHelper db = PedometerDBHelper.getInstance(this);
                 db.addToLastEntry(-difference);
                 db.close();
                 sharedPreferencesManager.removeData(PREF_PAUSE_COUNT_KEY);
@@ -99,7 +104,6 @@ public class PedometerService extends Service implements StepListener {
     public void onCreate() {
         super.onCreate();
         Logger.debug("PedometerService onCreate");
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             stepDetector = new StepCountDetector();
         } else {
@@ -191,27 +195,6 @@ public class PedometerService extends Service implements StepListener {
     public void onStep() {
         //TODO For Icecream Version Check data
 
-//        steps++;
-//        if (WAIT_FOR_VALID_STEPS && steps > 0) {
-//            WAIT_FOR_VALID_STEPS = false;
-//            PedometerDBHelper db = PedometerDBHelper.getInstance(this);
-//            if (db.getSteps(CalendarUtil.getTodayMills()) == Integer.MIN_VALUE) {
-//                int pauseDifference = steps - sharedPreferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY, steps);
-//                db.insertNewDay(CalendarUtil.getTodayMills(), steps - pauseDifference);
-//                if (pauseDifference > 0) {
-//                    // update pauseCount for the new day
-//                    sharedPreferencesManager.setPrefData(PREF_PAUSE_COUNT_KEY, steps);
-//                }
-//                reRegisterSensor();
-//            }
-//            db.saveCurrentSteps(steps);
-//            db.close();
-//
-//
-//            if(stepCallback != null) {
-//                stepCallback.onStep(steps);
-//            }
-//        }
     }
 
     public void setStepCallback(StepCallback stepCallback) {

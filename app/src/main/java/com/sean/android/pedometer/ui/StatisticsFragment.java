@@ -80,9 +80,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
     private NMapView nMapView;
     private int todayOffset;
     private int sinceBoot;
-    private int todaySteps;
 
-    private boolean hasLocationPermission = false;
     private boolean showSteps = true;
 
     private SharedPreferencesManager preferencesManager;
@@ -156,11 +154,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         super.onResume();
         nMapContext.onResume();
 
-        PedometerDBHelper db = PedometerDBHelper.getInstance(getActivity());
-        todayOffset = db.getSteps(CalendarUtil.getTodayMills());
 
-        sinceBoot = db.getCurrentSteps(); // do not use the value from the sharedPreferences
-        int pauseDifference = sinceBoot - preferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY, sinceBoot);
 
         if (!checkResumeState()) {
             SensorManager sm =
@@ -171,16 +165,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
                 sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, 0);
             }
         }
-
-        sinceBoot -= pauseDifference;
-
-        db.close();
-
-        Logger.debug("todayOffset : " + todayOffset + "sinceBoot : " + sinceBoot + "pauseDifference :" + pauseDifference);
-
-        todaySteps = Math.max(todayOffset + sinceBoot, 0);
-
-        updatePenometerData();
+        stepsDistanceChanged();
     }
 
     @Override
@@ -199,20 +184,18 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         db.close();
     }
 
-    private void stepsDistanceChanged() {
-//        if (showSteps) {
-//            ((TextView) getView().findViewById(R.id.unit)).setText(getString(R.string.steps));
-//        } else {
-//            String unit = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-//                    .getString("stepsize_unit", Fragment_Settings.DEFAULT_STEP_UNIT);
-//            if (unit.equals("cm")) {
-//                unit = "km";
-//            } else {
-//                unit = "mi";
-//            }
-//            ((TextView) getView().findViewById(R.id.unit)).setText(unit);
-//        }
-//
+    public void stepsDistanceChanged() {
+        PedometerDBHelper db = PedometerDBHelper.getInstance(getActivity());
+        todayOffset = db.getSteps(CalendarUtil.getTodayMills());
+
+        sinceBoot = db.getCurrentSteps(); // do not use the value from the sharedPreferences
+        int pauseDifference = sinceBoot - preferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY, sinceBoot);
+        sinceBoot -= pauseDifference;
+
+        db.close();
+
+        Logger.debug("todayOffset : " + todayOffset + "sinceBoot : " + sinceBoot + "pauseDifference :" + pauseDifference);
+
         updatePenometerData();
     }
 
@@ -252,9 +235,12 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
 
     private void updatePenometerData() {
         // todayOffset might still be Integer.MIN_VALUE on first start
+
+        int stepsToday = Math.max(todayOffset + sinceBoot, 0);
+
         float footSize = preferencesManager.getPrefFloatData(Penometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
-        float distanceToday = todaySteps * footSize;
-        stepTextView.setText(formatter.format(todaySteps));
+        float distanceToday = stepsToday * footSize;
+        stepTextView.setText(formatter.format(stepsToday));
         distanceTextView.setText(DistanceUtil.convertDistanceMeter(distanceToday));
     }
 
@@ -275,8 +261,6 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
             db.close();
         }
         sinceBoot = (int) event.values[0];
-
-        todaySteps = Math.max(sinceBoot + todayOffset, 0);
 
         updatePenometerData();
     }
@@ -427,7 +411,6 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
             }
             return false;
         }
-
         return true;
     }
 }

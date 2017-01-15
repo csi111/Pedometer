@@ -17,9 +17,6 @@
     <string name="naver_map_client_id">c5Bb9kADIXfe4FQwQL3z</string>
 
     <!-- Permission Check -->
-    <string name="permission_location_allow_message">Would you allow Your Location Permission?</string>
-    <string name="permission_location_denied_message">Denied Your Location Permission</string>
-    <string name="permission_storage_allow_message">Would you allow Your Storage Read Permission?</string>
-    <string name="permission_storage_denied_message">Denied Your Storage Read Permission</string>
+    <string name="permission_denied_message">Denied Permission</string>
 
 </resources>
