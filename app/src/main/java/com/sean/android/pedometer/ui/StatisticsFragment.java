@@ -363,7 +363,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
 
     @Override
     public void onReverseGeocoderResponse(NMapPlacemark nMapPlacemark, NMapError nMapError) {
-        locationTextView.setText(getString(R.string.title_location) + "\n" + nMapPlacemark.toString());
+        locationTextView.setText(nMapPlacemark.toString());
     }
 
     private class MapViewStateChangeListener implements NMapView.OnMapStateChangeListener {

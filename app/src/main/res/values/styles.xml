@@ -34,6 +34,16 @@
         <item name="android:textAllCaps">false</item>
     </style>
 
+
+    <style name="AppTheme.PenometerContainerTextStyle" parent="android:TextAppearance.Widget.TextView">
+        <item name="android:textSize">@dimen/map_view_location_size</item>
+        <item name="android:textColor">@color/colorLocationTitle</item>
+        <item name="android:layout_marginLeft">7dp</item>
+        <item name="android:layout_marginTop">7dp</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:gravity">right|center_vertical</item>
+    </style>
+
     <style name="AppTheme.PenometerStepTextStyle" parent="android:TextAppearance.Widget.TextView">
         <item name="android:textSize">@dimen/default_step_list_text_size</item>
         <item name="android:textColor">@color/colorPrimary</item>

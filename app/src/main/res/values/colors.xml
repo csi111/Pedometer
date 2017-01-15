@@ -12,7 +12,11 @@
     <color name="colorMainTabText">#fd3801</color>
     <color name="colorMainTabDisableText">#c8c8c8</color>
     <color name="colorMainTabIndicator">#ff3800</color>
+    <color name="colorCloseButton">#c8c73810</color>
 
     <color name="colorOverlayViewBackground">#c0ffffff</color>
+
+    <color name="colorMapTitle">#4b3c30</color>
+    <color name="colorLocationTitle">#8d97a3</color>
 
 </resources>

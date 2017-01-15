@@ -20,6 +20,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.sean.android.pedometer.R;
@@ -33,6 +34,7 @@ import com.sean.android.pedometer.ui.PedometerMiniView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
 import static com.sean.android.pedometer.ui.StatisticsFragment.DEFAULT_STEP_SIZE;
@@ -60,6 +62,9 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
 
     @BindView(R.id.overlay_distance_textview)
     TextView distanceTextView;
+
+    @BindView(R.id.close_button)
+    ImageButton closeButton;
 
     private SharedPreferencesManager sharedPreferencesManager;
 
@@ -266,5 +271,10 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
         float distanceToday = todaySteps * footSize;
         stepCountTextView.setText(formatter.format(todaySteps));
         distanceTextView.setText(DistanceUtil.convertDistanceMeter(distanceToday));
+    }
+
+    @OnClick(R.id.close_button)
+    void onClose(View view){
+        stopSelf();
     }
 }

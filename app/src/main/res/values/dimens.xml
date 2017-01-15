@@ -12,7 +12,12 @@
 
     <dimen name="text_margin">16dp</dimen>
 
+    <!-- Container -->
+    <dimen name="title_container_height">60dp</dimen>
 
+    <!-- Map View -->
+    <dimen name="map_view_title_size">16dp</dimen>
+    <dimen name="map_view_location_size">15dp</dimen>
 
     <!-- Overlay View -->
     <dimen name="overlayview_width">200dp</dimen>

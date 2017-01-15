@@ -7,6 +7,9 @@
     <string name="action_penometer_start">Penometer Start!</string>
     <string name="action_penometer_stop">Penometer Stop!</string>
 
+
+    <string name="title_stepcount">걸은 횟수</string>
+    <string name="title_distance">걸은 거리</string>
     <string name="title_location">현재 위치</string>
 
     <!-- DateFormat String -->
