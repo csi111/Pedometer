@@ -1,15 +1,21 @@
 package com.sean.android.pedometer.ui;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.sean.android.pedometer.R;
 import com.sean.android.pedometer.base.BaseFragment;
+import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.service.PenometerService;
 
 import java.util.ArrayList;
@@ -31,15 +37,13 @@ public class StatisticsActivity extends AppCompatActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
-        startService(new Intent(this, PenometerService.class));
-
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         TabViewPagerAdapter tabViewPagerAdapter = new TabViewPagerAdapter(getSupportFragmentManager(), this);
         tabViewPagerAdapter.setFragmentList(createTabFragments());
@@ -47,6 +51,16 @@ public class StatisticsActivity extends AppCompatActivity {
         statisticsViewPager.setAdapter(tabViewPagerAdapter);
         tabLayout.setupWithViewPager(statisticsViewPager);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
 

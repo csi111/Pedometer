@@ -8,7 +8,12 @@
     <string name="action_penometer_start">Penometer Start!</string>
     <string name="action_penometer_stop">Penometer Stop!</string>
 
+    <string name="title_location">Current Location</string>
+
     <!-- DateFormat String -->
     <string name="wod_date_format">yyyy.MM.dd E</string>
+
+    <!-- Naver Map Client ID-->
+    <string name="naver_map_client_id">c5Bb9kADIXfe4FQwQL3z</string>
 
 </resources>

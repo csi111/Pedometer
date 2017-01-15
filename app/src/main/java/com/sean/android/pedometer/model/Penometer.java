@@ -5,8 +5,10 @@ package com.sean.android.pedometer.model;
  */
 
 public class Penometer {
-    public static final String PREF_PAUSE_COUNT_KEY = "PauseCount";
+    public static final String PREF_PAUSE_COUNT_KEY = "PauseCount"; //Pause 모드
+    public static final String PREF_STEP_CURRENT_COUNT_KEY = "StepCount"; //Step Count
     public static final String PREF_STEP_SIZE_KEY = "StepSize";
+
     public static final String PREF_STEP_SIZE_UNIT_KEY = "StepSizeUnit";
 
 

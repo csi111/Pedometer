@@ -18,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:gravity="center"
         android:text="0"
         android:layout_marginTop="18dp"/>
 
@@ -26,6 +27,7 @@
         style="@style/AppTheme.PenometerBigTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="0Km"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/step_textview" />
@@ -34,10 +36,27 @@
         android:id="@+id/location_textview"
         style="@style/AppTheme.PenometerTextStyle"
         android:layout_width="match_parent"
+        android:gravity="center"
         android:layout_height="wrap_content"
         android:text="위치"
         android:layout_below="@id/distance_textview"
         android:layout_centerInParent="true" />
+
+    <Button
+        android:id="@+id/pause_button"
+        style="@style/AppTheme.PenometerButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_alignParentBottom="true" />
+
+    <com.nhn.android.maps.NMapView
+        android:layout_below="@id/location_textview"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"/>
+
+
 
 
 

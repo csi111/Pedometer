@@ -102,6 +102,11 @@ public class SharedPreferencesManager {
         editor.commit();
     }
 
+    public void setPrefData(String key, double value) {
+        SharedPreferences.Editor editor = pref.edit();
+
+    }
+
     public void setPrefData(String key, long value) {
         SharedPreferences.Editor editor = pref.edit();
 

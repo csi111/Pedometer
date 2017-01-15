@@ -22,11 +22,9 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 
@@ -35,13 +33,12 @@ import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PenometerDBHelper;
-
-import java.lang.annotation.Target;
+import com.sean.android.pedometer.model.Penometer;
 
 import static com.sean.android.pedometer.model.Penometer.PREF_PAUSE_COUNT_KEY;
 
 
-public class PenometerService extends Service implements SensorEventListener, StepListener {
+public class PenometerService extends Service implements StepListener {
 
     public final static String ACTION_PAUSE = "pause";
 
@@ -52,66 +49,34 @@ public class PenometerService extends Service implements SensorEventListener, St
 
     private StepSensorDetector stepDetector;
     private SharedPreferencesManager sharedPreferencesManager;
+    private StepCallback stepCallback;
 
-    @Override
-    public void onAccuracyChanged(final Sensor sensor, int accuracy) {
-        // nobody knows what happens here: step value might magically decrease
-        // when this method is called...
-        Logger.debug(sensor.getName() + " accuracy changed: " + accuracy);
-    }
+    private IBinder serviceBinder = new ServiceBinder();
 
-    @Override
-    public void onSensorChanged(final SensorEvent event) {
-        if (event.values[0] > Integer.MAX_VALUE) {
-            Logger.debug("probably not a real value: " + event.values[0]);
-            return;
-        } else {
-            steps = (int) event.values[0];
-            if (WAIT_FOR_VALID_STEPS && steps > 0) {
-                WAIT_FOR_VALID_STEPS = false;
-                PenometerDBHelper db = PenometerDBHelper.getInstance(this);
-                if (db.getSteps(CalendarUtil.getTodayMills()) == Integer.MIN_VALUE) {
-                    int pauseDifference = steps -
-                            getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-                                    .getInt("pauseCount", steps);
-                    db.insertNewDay(CalendarUtil.getTodayMills(), steps - pauseDifference);
-                    if (pauseDifference > 0) {
-                        // update pauseCount for the new day
-                        getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                                .putInt("pauseCount", steps).commit();
-                    }
-                    reRegisterSensor();
-                }
-                db.saveCurrentSteps(steps);
-                db.close();
-            }
-        }
-    }
+    private int todayoffset; //Service 시작전 DB상에 저장된 오늘 기록
+    private int sinceBoot; // From 00:00 ~ 현재까지 기록된 Step Count
+    private int todaySteps; //Service 시작 이후부터 저장되고 있는 기록
 
     @Override
     public IBinder onBind(final Intent intent) {
-        return null;
+        Logger.debug("IBinder onBind");
+        return serviceBinder;
     }
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
+        Logger.debug("onStartCommand action");
         if (intent != null && ACTION_PAUSE.equals(intent.getStringExtra("action"))) {
-                Logger.debug("onStartCommand action: " + intent.getStringExtra("action"));
-            if (steps == 0) {
-                PenometerDBHelper db = PenometerDBHelper.getInstance(this);
-                steps = db.getCurrentSteps();
-                db.close();
-            }
+            Logger.debug("onStartCommand action: " + intent.getStringExtra("action"));
+            PenometerDBHelper db = PenometerDBHelper.getInstance(this);
+            sinceBoot = db.getCurrentSteps();
 
-
-            if(sharedPreferencesManager.contains(PREF_PAUSE_COUNT_KEY)) {
+            if (sharedPreferencesManager.contains(PREF_PAUSE_COUNT_KEY)) {
                 int difference = steps - sharedPreferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY);
-                PenometerDBHelper db = PenometerDBHelper.getInstance(this);
                 db.addToLastEntry(-difference);
                 db.close();
                 sharedPreferencesManager.removeData(PREF_PAUSE_COUNT_KEY);
-            }
-            else { // pause counting
+            } else { // pause counting
                 // cancel restart
                 ((AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE))
                         .cancel(PendingIntent.getService(getApplicationContext(), 2,
@@ -148,6 +113,18 @@ public class PenometerService extends Service implements SensorEventListener, St
 
         stepDetector.addStepListener(this);
         sharedPreferencesManager = SharedPreferencesManager.getInstance();
+
+
+        PenometerDBHelper db = PenometerDBHelper.getInstance(this);
+        todayoffset = db.getSteps(CalendarUtil.getTodayMills());
+        sinceBoot = db.getCurrentSteps(); // do not use the value from the sharedPreferences
+
+        int pauseDifference = sinceBoot - sharedPreferencesManager.getPrefIntegerData(Penometer.PREF_PAUSE_COUNT_KEY, sinceBoot);
+
+        todaySteps = Math.max(todayoffset + sinceBoot, 0);
+
+        Logger.debug("todayoffset : " + todayoffset + " sinceBoot : " + sinceBoot + "todaySteps =" + todaySteps + " pauseDifference :" + pauseDifference);
+
         reRegisterSensor();
     }
 
@@ -201,8 +178,8 @@ public class PenometerService extends Service implements SensorEventListener, St
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void onStep(float stepValue) {
+        Logger.debug("onStep value [" + stepValue + "]");
         if (stepValue > Integer.MAX_VALUE) {
-            Logger.debug("probably not a real value: " + stepValue);
             return;
         } else {
             steps = (int) stepValue;
@@ -211,6 +188,7 @@ public class PenometerService extends Service implements SensorEventListener, St
                 PenometerDBHelper db = PenometerDBHelper.getInstance(this);
                 if (db.getSteps(CalendarUtil.getTodayMills()) == Integer.MIN_VALUE) {
                     int pauseDifference = steps - sharedPreferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY, steps);
+
                     db.insertNewDay(CalendarUtil.getTodayMills(), steps - pauseDifference);
                     if (pauseDifference > 0) {
                         // update pauseCount for the new day
@@ -227,6 +205,43 @@ public class PenometerService extends Service implements SensorEventListener, St
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
     @Override
     public void onStep() {
+        //TODO For Icecream Version Check data
 
+//        steps++;
+//        if (WAIT_FOR_VALID_STEPS && steps > 0) {
+//            WAIT_FOR_VALID_STEPS = false;
+//            PenometerDBHelper db = PenometerDBHelper.getInstance(this);
+//            if (db.getSteps(CalendarUtil.getTodayMills()) == Integer.MIN_VALUE) {
+//                int pauseDifference = steps - sharedPreferencesManager.getPrefIntegerData(PREF_PAUSE_COUNT_KEY, steps);
+//                db.insertNewDay(CalendarUtil.getTodayMills(), steps - pauseDifference);
+//                if (pauseDifference > 0) {
+//                    // update pauseCount for the new day
+//                    sharedPreferencesManager.setPrefData(PREF_PAUSE_COUNT_KEY, steps);
+//                }
+//                reRegisterSensor();
+//            }
+//            db.saveCurrentSteps(steps);
+//            db.close();
+//
+//
+//            if(stepCallback != null) {
+//                stepCallback.onStep(steps);
+//            }
+//        }
     }
+
+    public void setStepCallback(StepCallback stepCallback) {
+        this.stepCallback = stepCallback;
+    }
+
+    public class ServiceBinder extends Binder {
+        public PenometerService getService() {
+            return PenometerService.this;
+        }
+    }
+
+    public interface StepCallback {
+        void onStep(int value);
+    }
+
 }
