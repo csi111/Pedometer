@@ -27,7 +27,7 @@ public class AppUpdatedReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(final Context context, final Intent intent) {
-			Logger.debug("app updated");
+		Logger.debug("App Updated onReceive");
 		context.startService(new Intent(context, PedometerService.class));
 	}
 

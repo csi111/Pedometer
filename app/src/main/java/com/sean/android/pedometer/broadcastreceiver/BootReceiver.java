@@ -24,31 +24,30 @@ import android.content.SharedPreferences;
 import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
+import com.sean.android.pedometer.model.Pedometer;
 import com.sean.android.pedometer.service.PedometerService;
 
 public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        Logger.debug("booted");
+        Logger.debug("App Booted onReceive");
 
         SharedPreferencesManager.getInstance().load(context);
 
         PedometerDBHelper db = PedometerDBHelper.getInstance(context);
 
-        if (!SharedPreferencesManager.getInstance().getPrefBooleanData("correctShutdown", false)) {
+        if (!SharedPreferencesManager.getInstance().getPrefBooleanData(Pedometer.PREF_CORRECT_SHUTDOWN, false)) {
             Logger.debug("Incorrect shutdown");
             // can we at least recover some steps?
             int steps = db.getCurrentSteps();
-            Logger.debug("Trying to recover " + steps + " steps");
             db.addToLastEntry(steps);
         }
         // last entry might still have a negative step value, so remove that
         // row if that's the case
         db.removeNegativeEntries();
-        db.saveCurrentSteps(0);
         db.close();
-        SharedPreferencesManager.getInstance().removeDataApply("correctShutdown");
+        SharedPreferencesManager.getInstance().removeDataApply(Pedometer.PREF_CORRECT_SHUTDOWN);
 
         context.startService(new Intent(context, PedometerService.class));
     }

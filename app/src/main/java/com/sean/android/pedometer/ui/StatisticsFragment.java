@@ -2,10 +2,8 @@ package com.sean.android.pedometer.ui;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,7 +11,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -31,6 +28,8 @@ import com.nhn.android.maps.NMapView;
 import com.nhn.android.maps.maplib.NGeoPoint;
 import com.nhn.android.maps.nmapmodel.NMapError;
 import com.nhn.android.maps.nmapmodel.NMapPlacemark;
+import com.nhn.android.maps.overlay.NMapPOIdata;
+import com.nhn.android.mapviewer.overlay.NMapOverlayManager;
 import com.sean.android.pedometer.R;
 import com.sean.android.pedometer.base.BaseFragment;
 import com.sean.android.pedometer.base.Logger;
@@ -53,14 +52,13 @@ import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
 /**
  *
  */
-public class StatisticsFragment extends BaseFragment implements SensorEventListener, ServiceConnection, NMapLocationManager.OnLocationChangeListener, NMapActivity.OnDataProviderListener {
+public class StatisticsFragment extends BaseFragment implements SensorEventListener, NMapLocationManager.OnLocationChangeListener, NMapActivity.OnDataProviderListener {
 
     public static final int NAVER_MAP_SCALE_LEVEL = 12;
     public final static float DEFAULT_STEP_SIZE = Locale.getDefault() == Locale.US ? 2.5f : 75f;
     public static final int LOCATION_UPDATE_INTERVAL_MILLIS = 10000; // 변경 추척
 
     public static final int LOCATION_UPDATE_DISTANCE = 3; // 변경 추적 범위 (meter)
-    public static final long RETAIN_GPS_MILLIS = 600000L; // gps 위치 보존 시간
     public static final long LOCATION_FIND_TIMEOUT = 10000; // TimeOut
 
     public final static NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
@@ -81,14 +79,13 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
 
     private NMapContext nMapContext;
     private NMapView nMapView;
+    private NMapViewerResourceProvider nMapViewerResourceProvider;
+    private NMapOverlayManager nMapOverlayManager;
+
     private int todayOffset;
     private int sinceBoot;
 
     private SharedPreferencesManager preferencesManager;
-
-    private PedometerService pedometerService;
-
-    private PedometerService.StepCallback stepCallback;
 
     private NMapLocationManager nMapLocationManager;
 
@@ -117,14 +114,6 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         nMapContext = new NMapContext(getContext());
         nMapContext.onCreate();
         nMapContext.setMapDataProviderListener(this);
-
-        stepCallback = new PedometerService.StepCallback() {
-            @Override
-            public void onStep(int value) {
-                Logger.debug("onStep Value = [" + value + "]");
-                stepTextView.setText(formatter.format(value));
-            }
-        };
     }
 
     @Override
@@ -154,7 +143,6 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
     public void onResume() {
         super.onResume();
         nMapContext.onResume();
-
 
 
         if (!checkResumeState()) {
@@ -271,25 +259,6 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
 
     }
 
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        pedometerService = ((PedometerService.ServiceBinder) service).getService();
-        pedometerService.setStepCallback(stepCallback);
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        pedometerService = null;
-    }
-
-    private void bindPenometerService() {
-        getActivity().bindService(new Intent(getActivity(), PedometerService.class), this, Context.BIND_AUTO_CREATE + Context.BIND_DEBUG_UNBIND);
-    }
-
-    private void unbindPenometerService() {
-        getActivity().unbindService(this);
-    }
-
     private boolean checkResumeState() throws NullPointerException {
         return preferencesManager.contains(PREF_PAUSE_COUNT_KEY);
     }
@@ -329,6 +298,10 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         nMapView.setClientId(getString(R.string.naver_map_client_id));
         nMapContext.setupMapView(nMapView);
         nMapView.setOnMapStateChangeListener(new MapViewStateChangeListener(nMapView.getMapController()));
+        nMapViewerResourceProvider = new NMapViewerResourceProvider(getContext());
+        nMapOverlayManager = new NMapOverlayManager(getContext(), nMapView, nMapViewerResourceProvider);
+
+
     }
 
     private void restoreInstanceState(NMapController mMapController, NGeoPoint nGeoPoint) {
@@ -386,6 +359,7 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         public void onMapCenterChange(NMapView nMapView, NGeoPoint nGeoPoint) {
             Logger.debug("onMapCenterChange: nGeoPoint");
             restoreInstanceState(mMapController, nGeoPoint);
+            setMarker(nGeoPoint);
         }
 
         @Override
@@ -402,6 +376,20 @@ public class StatisticsFragment extends BaseFragment implements SensorEventListe
         public void onAnimationStateChange(NMapView nMapView, int i, int i1) {
             Logger.debug("onAnimationStateChange [" + i + "], [" + i1 + "]");
         }
+    }
+
+    private void setMarker(NGeoPoint nGeoPoint)
+    {
+        // Markers for POI item
+        int markerId = NMapViewerResourceProvider.NMapPOIflagType.PIN;
+
+        // set POI data
+        NMapPOIdata poiData = new NMapPOIdata(1, nMapViewerResourceProvider);
+        poiData.beginPOIdata(1);
+        poiData.addPOIitem(nGeoPoint, "", markerId, 0);
+        poiData.endPOIdata();
+        // create POI data overlay
+        nMapOverlayManager.createPOIdataOverlay(poiData, null);
     }
 
 

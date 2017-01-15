@@ -133,11 +133,6 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
 
     }
 
-    /**
-     * Adds the given number of steps to the last entry in the database
-     *
-     * @param steps the number of steps to add. Must be > 0
-     */
     public void addToLastEntry(int steps) {
         Logger.debug("addToLastEntry() Steps = [" + steps +"]");
         if (steps > 0) {
@@ -146,41 +141,6 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * Inserts a new entry in the database, if there is no entry for the given
-     * date yet. Use this method for restoring data from a backup.
-     * <p/>
-     * This method does nothing if there is already an entry for 'date'.
-     *
-     * @param date  the date in ms since 1970
-     * @param steps the step value for 'date'; must be >= 0
-     * @return true if a new entry was created, false if there was already an
-     * entry for 'date'
-     */
-    public boolean insertDayFromBackup(long date, int steps) {
-        getWritableDatabase().beginTransaction();
-        boolean re;
-        try {
-            Cursor c = getReadableDatabase().query(TABLE_NAME, new String[]{"date"}, "date = ?",
-                    new String[]{String.valueOf(date)}, null, null, null);
-            re = c.getCount() == 0 && steps >= 0;
-            if (re) {
-                ContentValues values = new ContentValues();
-                values.put("date", date);
-                values.put("steps", steps);
-                getWritableDatabase().insert(TABLE_NAME, null, values);
-            }
-            c.close();
-            getWritableDatabase().setTransactionSuccessful();
-        } finally {
-            getWritableDatabase().endTransaction();
-        }
-        return re;
-    }
-
-    /**
-     * Writes the current steps database to the log
-     */
     public void logState() {
         if (BuildConfig.DEBUG) {
             Cursor c = getReadableDatabase()
@@ -190,11 +150,6 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * Get the total of steps taken without today's value
-     *
-     * @return number of steps taken, ignoring today
-     */
     public int getTotalWithoutToday() {
         Cursor c = getReadableDatabase()
                 .query(TABLE_NAME, new String[]{"SUM(steps)"}, "steps > 0 AND date > 0 AND date < ?",
@@ -234,46 +189,24 @@ public class PedometerDBHelper extends SQLiteOpenHelper {
         return records;
     }
 
-    /**
-     * Get the maximum of steps walked in one day
-     *
-     * @return the maximum number of steps walked in one day
-     */
-    public int getRecord() {
+    public int getMaximumRecord() {
         Cursor c = getReadableDatabase()
                 .query(TABLE_NAME, new String[]{"MAX(steps)"}, "date > 0", null, null, null, null);
         c.moveToFirst();
-        int re = c.getInt(0);
+        int step = c.getInt(0);
         c.close();
-        return re;
+        return step;
     }
 
-    /**
-     * Get the maximum of steps walked in one day and the date that happend
-     *
-     * @return a pair containing the date (Date) in millis since 1970 and the
-     * step value (Integer)
-     */
-    public Pair<Date, Integer> getBestRecordData() {
+    public Record getBestRecordData() {
         Cursor c = getReadableDatabase()
                 .query(TABLE_NAME, new String[]{"date, steps"}, "date > 0", null, null, null,
                         "steps DESC", "1");
         c.moveToFirst();
-        Pair<Date, Integer> p = new Pair<Date, Integer>(new Date(c.getLong(0)), c.getInt(1));
-        c.close();
-        return p;
+        Record record = new Record(c.getLong(0), c.getInt(1));
+        return record;
     }
 
-    /**
-     * Get the number of steps taken for a specific date.
-     * <p/>
-     * If date is Util.getToday(), this method returns the offset which needs to
-     * be added to the value returned by getCurrentSteps() to get todays steps.
-     *
-     * @param date the date in millis since 1970
-     * @return the steps taken on this date or Integer.MIN_VALUE if date doesn't
-     * exist in the database
-     */
     public int getSteps(final long date) {
         Cursor c = getReadableDatabase().query(TABLE_NAME, new String[]{COLUMN_STEPS}, "date = ?",
                 new String[]{String.valueOf(date)}, null, null, null);

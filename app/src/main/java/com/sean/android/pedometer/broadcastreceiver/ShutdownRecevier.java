@@ -22,7 +22,9 @@ import android.content.Intent;
 
 import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.CalendarUtil;
+import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
+import com.sean.android.pedometer.model.Pedometer;
 import com.sean.android.pedometer.service.PedometerService;
 
 public class ShutdownRecevier extends BroadcastReceiver {
@@ -33,30 +35,21 @@ public class ShutdownRecevier extends BroadcastReceiver {
 
         context.startService(new Intent(context, PedometerService.class));
 
-        // if the user used a root script for shutdown, the DEVICE_SHUTDOWN
-        // broadcast might not be send. Therefore, the app will check this
-        // setting on the next boot and displays an error message if it's not
-        // set to true
-        context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                .putBoolean("correctShutdown", true).commit();
+        SharedPreferencesManager sharedPreferencesManager = SharedPreferencesManager.getInstance();
+        sharedPreferencesManager.load(context);
+        sharedPreferencesManager.setPrefData(Pedometer.PREF_CORRECT_SHUTDOWN, true);
 
         PedometerDBHelper db = PedometerDBHelper.getInstance(context);
-        // if it's already a new day, add the temp. steps to the last one
         if (db.getSteps(CalendarUtil.getTodayMills()) == Integer.MIN_VALUE) {
             int steps = db.getCurrentSteps();
-            int pauseDifference = steps -
-                    context.getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-                            .getInt("pauseCount", steps);
+            int pauseDifference = steps - sharedPreferencesManager.getPrefIntegerData(Pedometer.PREF_PAUSE_COUNT_KEY, steps);
             db.insertNewDay(CalendarUtil.getTodayMills(), steps - pauseDifference);
             if (pauseDifference > 0) {
-                // update pauseCount for the new day
-                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                        .putInt("pauseCount", steps).commit();
+                sharedPreferencesManager.setPrefData(Pedometer.PREF_PAUSE_COUNT_KEY, steps);
             }
         } else {
             db.addToLastEntry(db.getCurrentSteps());
         }
-        // current steps will be reset on boot @see BootReceiver
         db.close();
     }
 
