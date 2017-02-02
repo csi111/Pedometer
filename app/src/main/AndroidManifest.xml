@@ -51,12 +51,11 @@
         <provider
             android:name=".database.PedometerContentProvider"
             android:authorities="@string/content_authority"
-            android:exported="false"/>
+            android:exported="true"/>
 
         <receiver android:name=".broadcastreceiver.ShutdownRecevier">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_SHUTDOWN" />
-                <action android:name="de.j4velin.ACTION_SHUTDOWN" />
             </intent-filter>
         </receiver>
 

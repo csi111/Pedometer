@@ -49,9 +49,6 @@ import butterknife.OnClick;
 
 import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
 
-/**
- *
- */
 public class PedoStatisticsFragment extends BaseFragment implements SensorEventListener, NMapLocationManager.OnLocationChangeListener, NMapActivity.OnDataProviderListener {
 
     public static final int NAVER_MAP_SCALE_LEVEL = 12;
@@ -378,8 +375,7 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
         }
     }
 
-    private void setMarker(NGeoPoint nGeoPoint)
-    {
+    private void setMarker(NGeoPoint nGeoPoint) {
         // Markers for POI item
         int markerId = NMapViewerResourceProvider.NMapPOIflagType.PIN;
 
@@ -395,10 +391,9 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
 
     private boolean checkLocationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                return true;
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return false;
             }
-            return false;
         }
         return true;
     }

@@ -22,7 +22,6 @@ public class PedometerContract implements BaseColumns {
 
     public static final String PATH_PENOMETER = "penometer";
 
-
     static final String SQL_CREATE_STEPS_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
             COLUMN_DATE + " INTEGER, " +
             COLUMN_STEPS + " INTEGER " +
@@ -45,4 +44,5 @@ public class PedometerContract implements BaseColumns {
 
 
     static final String SQL_ADD_LAST_ENTRY = "UPDATE " + TABLE_NAME + " SET " + COLUMN_STEPS + "= " + COLUMN_STEPS+ "+ ? WHERE date = (SELECT MAX(" +COLUMN_DATE +") FROM " + TABLE_NAME +")";
+
 }

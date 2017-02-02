@@ -93,8 +93,6 @@ public class StatisticsActivity extends AppCompatActivity implements PermissionL
         new TedPermission(this).setPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .setPermissionListener(this)
                 .check();
-
-
     }
 
     @Override

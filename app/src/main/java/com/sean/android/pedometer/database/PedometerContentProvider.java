@@ -41,8 +41,6 @@ public class PedometerContentProvider extends ContentProvider {
         Cursor cursor;
 
         switch (uriMatcher.match(uri)) {
-
-
             case CODE_PENOMETER_HISTORY: {
                 cursor = dbHelper.getReadableDatabase().query(PedometerContract.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;

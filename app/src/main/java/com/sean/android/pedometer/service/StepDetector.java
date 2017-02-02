@@ -27,6 +27,7 @@ import android.util.Log;
 
 /**
  * Detects steps and notifies all listeners (that implement StepListener).
+ * https://github.com/bagilevi/android-pedometer
  * @author Levente Bagi
  */
 

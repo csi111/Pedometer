@@ -36,7 +36,9 @@ import com.sean.android.pedometer.database.PedometerDBHelper;
 
 import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
 
-
+/**
+ * Reference : https://github.com/j4velin/Pedometer
+ */
 public class PedometerService extends Service implements StepListener {
 
     public final static String ACTION_PAUSE = "pause";
