@@ -16,14 +16,11 @@ public class SharedPreferencesManager {
     private volatile static SharedPreferencesManager sharedPreferencesManager;
     private SharedPreferences pref;
 
+    private SharedPreferencesManager() {
+    }
+
     public static SharedPreferencesManager getInstance() {
-        if (sharedPreferencesManager == null) {
-            synchronized (SharedPreferencesManager.class) {
-                if (sharedPreferencesManager == null)
-                    sharedPreferencesManager = new SharedPreferencesManager();
-            }
-        }
-        return sharedPreferencesManager;
+        return SharedPreferencesManagerHolder.INSTANCE;
     }
 
     /**
@@ -169,5 +166,9 @@ public class SharedPreferencesManager {
 
     public boolean contains(String key) {
         return pref.contains(key);
+    }
+
+    private static class SharedPreferencesManagerHolder {
+        public static final SharedPreferencesManager INSTANCE = new SharedPreferencesManager();
     }
 }

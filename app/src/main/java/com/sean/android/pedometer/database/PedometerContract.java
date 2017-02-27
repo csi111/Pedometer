@@ -22,6 +22,7 @@ public class PedometerContract implements BaseColumns {
 
     public static final String PATH_PENOMETER = "penometer";
 
+
     static final String SQL_CREATE_STEPS_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
             COLUMN_DATE + " INTEGER, " +
             COLUMN_STEPS + " INTEGER " +
