@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.sean.android.pedometer.service;
+package com.sean.android.pedometer.service.step;
 
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
@@ -33,6 +33,10 @@ import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
+import com.sean.android.pedometer.service.AbsStepSensorDetector;
+import com.sean.android.pedometer.service.StepCountDetector;
+import com.sean.android.pedometer.service.StepDetector;
+import com.sean.android.pedometer.service.StepListener;
 
 import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
 

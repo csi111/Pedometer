@@ -18,8 +18,6 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.nhn.android.maps.NMapActivity;
 import com.nhn.android.maps.NMapContext;
@@ -40,13 +38,11 @@ import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
 import com.sean.android.pedometer.databinding.FragmentStatisticsBinding;
 import com.sean.android.pedometer.model.Pedometer;
-import com.sean.android.pedometer.service.PedometerService;
+import com.sean.android.pedometer.service.step.PedometerService;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
@@ -84,9 +80,7 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        fragmentStatisticsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_statistics, container, false);
-        initNaverMap(fragmentStatisticsBinding.contentStatistics);
-        return fragmentStatisticsBinding.contentStatistics;
+        return inflater.inflate(R.layout.fragment_statistics, container, false);
     }
 
     @Override
@@ -105,7 +99,8 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        fragmentStatisticsBinding = DataBindingUtil.bind(view);
+        initNaverMap(fragmentStatisticsBinding.contentStatistics);
         if (!checkResumeState()) {
             fragmentStatisticsBinding.pauseButton.setText(getString(R.string.action_pedometer_stop));
             fragmentStatisticsBinding.pauseButton.setBackgroundColor(getResources().getColor(R.color.colorMainTabText));

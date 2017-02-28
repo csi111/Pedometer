@@ -19,13 +19,12 @@ package com.sean.android.pedometer.broadcastreceiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 
 import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
 import com.sean.android.pedometer.model.Pedometer;
-import com.sean.android.pedometer.service.PedometerService;
+import com.sean.android.pedometer.service.step.PedometerService;
 
 public class BootReceiver extends BroadcastReceiver {
 

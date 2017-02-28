@@ -12,7 +12,7 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.sean.android.pedometer.R;
 import com.sean.android.pedometer.databinding.ActivityStatisticsBinding;
-import com.sean.android.pedometer.service.PedometerService;
+import com.sean.android.pedometer.service.step.PedometerService;
 import com.sean.android.pedometer.service.PedometerSystemOverlayService;
 import com.sean.android.pedometer.ui.PedoHistorysFragment;
 import com.sean.android.pedometer.ui.PedoStatisticsFragment;

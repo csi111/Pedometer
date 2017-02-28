@@ -21,6 +21,7 @@ import com.sean.android.pedometer.databinding.FragmentPedometerHistoryListBindin
 import com.sean.android.pedometer.model.Record;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
@@ -43,21 +44,19 @@ public class PedoHistorysFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        records = new ArrayList<>();
+        records = Collections.emptyList();
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        fragmentPedometerHistoryListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_pedometer_history_list, container, false);
-        return fragmentPedometerHistoryListBinding.pedometerHistoryLayout;
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_pedometer_history_list, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        fragmentPedometerHistoryListBinding = DataBindingUtil.bind(view);
         if (mColumnCount <= 1) {
             fragmentPedometerHistoryListBinding.pedometerHistoryRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
         } else {

@@ -25,7 +25,7 @@ import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
 import com.sean.android.pedometer.model.Pedometer;
-import com.sean.android.pedometer.service.PedometerService;
+import com.sean.android.pedometer.service.step.PedometerService;
 
 public class ShutdownRecevier extends BroadcastReceiver {
 

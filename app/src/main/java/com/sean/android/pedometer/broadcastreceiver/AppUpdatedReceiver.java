@@ -21,7 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.sean.android.pedometer.base.Logger;
-import com.sean.android.pedometer.service.PedometerService;
+import com.sean.android.pedometer.service.step.PedometerService;
 
 public class AppUpdatedReceiver extends BroadcastReceiver {
 

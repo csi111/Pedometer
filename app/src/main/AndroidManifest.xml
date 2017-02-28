@@ -47,7 +47,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.PedometerService" />
+        <service android:name=".service.step.PedometerService" />
 
         <service
             android:name=".service.PedometerSystemOverlayService"
