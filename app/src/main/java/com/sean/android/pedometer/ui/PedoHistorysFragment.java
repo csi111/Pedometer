@@ -1,12 +1,12 @@
 package com.sean.android.pedometer.ui;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +17,11 @@ import com.sean.android.pedometer.base.Logger;
 import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
+import com.sean.android.pedometer.databinding.FragmentPedometerHistoryListBinding;
 import com.sean.android.pedometer.model.Record;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
 
@@ -34,11 +32,8 @@ public class PedoHistorysFragment extends BaseFragment {
 
     private List<Record> records;
 
+    private FragmentPedometerHistoryListBinding fragmentPedometerHistoryListBinding;
 
-    @BindView(R.id.pedometer_history_recyclerview)
-    RecyclerView recyclerView;
-
-    @SuppressWarnings("unused")
     public static Fragment newInstance(Context context, String title) {
         Bundle args = new Bundle();
         args.putString(TITLE_PARAM, title);
@@ -55,9 +50,8 @@ public class PedoHistorysFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_penometer_history_list, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+        fragmentPedometerHistoryListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_pedometer_history_list, container, false);
+        return fragmentPedometerHistoryListBinding.pedometerHistoryLayout;
     }
 
     @Override
@@ -65,12 +59,12 @@ public class PedoHistorysFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (mColumnCount <= 1) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            fragmentPedometerHistoryListBinding.pedometerHistoryRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
         } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
+            fragmentPedometerHistoryListBinding.pedometerHistoryRecyclerview.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
         }
 
-        recyclerView.setAdapter(new PedoHistoryRecyclerViewAdapter(records, mListener));
+        fragmentPedometerHistoryListBinding.pedometerHistoryRecyclerview.setAdapter(new PedoHistoryRecyclerViewAdapter(records, mListener));
     }
 
     @Override
@@ -89,7 +83,7 @@ public class PedoHistorysFragment extends BaseFragment {
         records.add(getCurrentTimeRecord(db.getSteps(CalendarUtil.getTodayMills()), db.getCurrentSteps()));
 
         db.close();
-        recyclerView.getAdapter().notifyDataSetChanged();
+        fragmentPedometerHistoryListBinding.pedometerHistoryRecyclerview.getAdapter().notifyDataSetChanged();
 
     }
 

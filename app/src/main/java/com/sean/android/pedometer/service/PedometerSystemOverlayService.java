@@ -1,6 +1,7 @@
 package com.sean.android.pedometer.service;
 
 import android.annotation.TargetApi;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -112,7 +113,7 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
         Logger.debug("todayOffset : " + todayOffset + "sinceBoot : " + sinceBoot + "pauseDifference :" + pauseDifference);
 
         todaySteps = Math.max(todayOffset + sinceBoot, 0);
-        updatePenometerData();
+        updatePedometerData();
     }
 
     @Override
@@ -154,7 +155,13 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
     @TargetApi(Build.VERSION_CODES.M)
     public void onObtainingPermissionOverlayWindow() {
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-        startActivity(intent);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(getBaseContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        try {
+            pendingIntent.send();
+        } catch (PendingIntent.CanceledException e) {
+            e.printStackTrace();
+        }
         stopSelf();
     }
 
@@ -252,7 +259,7 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
 
         todaySteps = Math.max(sinceBoot + todayOffset, 0);
 
-        updatePenometerData();
+        updatePedometerData();
     }
 
     @Override
@@ -264,7 +271,7 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
         return sharedPreferencesManager.contains(PREF_PAUSE_COUNT_KEY);
     }
 
-    private void updatePenometerData() {
+    private void updatePedometerData() {
         // todayOffset might still be Integer.MIN_VALUE on first start
         float footSize = sharedPreferencesManager.getPrefFloatData(Pedometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
         float distanceToday = todaySteps * footSize;
@@ -273,7 +280,7 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
     }
 
     @OnClick(R.id.close_button)
-    void onClose(View view){
+    void onClose(View view) {
         stopSelf();
     }
 }

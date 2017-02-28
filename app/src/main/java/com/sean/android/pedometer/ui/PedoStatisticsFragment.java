@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -37,6 +38,7 @@ import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.DistanceUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
+import com.sean.android.pedometer.databinding.FragmentStatisticsBinding;
 import com.sean.android.pedometer.model.Pedometer;
 import com.sean.android.pedometer.service.PedometerService;
 
@@ -60,20 +62,6 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
 
     public final static NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
 
-    @BindView(R.id.step_textview)
-    TextView stepTextView;
-
-    @BindView(R.id.distance_textview)
-    TextView distanceTextView;
-
-
-    @BindView(R.id.location_textview)
-    TextView locationTextView;
-
-    @BindView(R.id.pause_button)
-    Button pauseButton;
-
-
     private NMapContext nMapContext;
     private NMapView nMapView;
     private NMapViewerResourceProvider nMapViewerResourceProvider;
@@ -86,6 +74,8 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
 
     private NMapLocationManager nMapLocationManager;
 
+    private FragmentStatisticsBinding fragmentStatisticsBinding;
+
     public static Fragment newInstance(Context context, String title) {
         Bundle args = new Bundle();
         args.putString(TITLE_PARAM, title);
@@ -94,10 +84,9 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_statistics, container, false);
-        ButterKnife.bind(this, view);
-        initNaverMap(view);
-        return view;
+        fragmentStatisticsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_statistics, container, false);
+        initNaverMap(fragmentStatisticsBinding.contentStatistics);
+        return fragmentStatisticsBinding.contentStatistics;
     }
 
     @Override
@@ -118,11 +107,11 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
         super.onViewCreated(view, savedInstanceState);
 
         if (!checkResumeState()) {
-            pauseButton.setText(getString(R.string.action_pedometer_stop));
-            pauseButton.setBackgroundColor(getResources().getColor(R.color.colorMainTabText));
+            fragmentStatisticsBinding.pauseButton.setText(getString(R.string.action_pedometer_stop));
+            fragmentStatisticsBinding.pauseButton.setBackgroundColor(getResources().getColor(R.color.colorMainTabText));
         } else {
-            pauseButton.setText(getString(R.string.action_pedometer_start));
-            pauseButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            fragmentStatisticsBinding.pauseButton.setText(getString(R.string.action_pedometer_start));
+            fragmentStatisticsBinding.pauseButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         }
     }
 
@@ -182,7 +171,7 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
 
         Logger.debug("todayOffset : " + todayOffset + "sinceBoot : " + sinceBoot + "pauseDifference :" + pauseDifference);
 
-        updatePenometerData();
+        updatePedometerData();
     }
 
     @Override
@@ -209,25 +198,25 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
             sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                     SensorManager.SENSOR_DELAY_UI, 0);
 
-            pauseButton.setText(getString(R.string.action_pedometer_stop));
-            pauseButton.setBackgroundColor(getResources().getColor(R.color.colorMainTabText));
+            fragmentStatisticsBinding.pauseButton.setText(getString(R.string.action_pedometer_stop));
+            fragmentStatisticsBinding.pauseButton.setBackgroundColor(getResources().getColor(R.color.colorMainTabText));
         } else {
             sm.unregisterListener(this);
-            pauseButton.setText(getString(R.string.action_pedometer_start));
-            pauseButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            fragmentStatisticsBinding.pauseButton.setText(getString(R.string.action_pedometer_start));
+            fragmentStatisticsBinding.pauseButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         }
 
     }
 
-    private void updatePenometerData() {
+    private void updatePedometerData() {
         // todayOffset might still be Integer.MIN_VALUE on first start
 
         int stepsToday = Math.max(todayOffset + sinceBoot, 0);
 
         float footSize = preferencesManager.getPrefFloatData(Pedometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
         float distanceToday = stepsToday * footSize;
-        stepTextView.setText(formatter.format(stepsToday));
-        distanceTextView.setText(DistanceUtil.convertDistanceMeter(distanceToday));
+        fragmentStatisticsBinding.stepTextview.setText(formatter.format(stepsToday));
+        fragmentStatisticsBinding.distanceTextview.setText(DistanceUtil.convertDistanceMeter(distanceToday));
     }
 
 
@@ -248,7 +237,7 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
         }
         sinceBoot = (int) event.values[0];
 
-        updatePenometerData();
+        updatePedometerData();
     }
 
     @Override
@@ -333,7 +322,7 @@ public class PedoStatisticsFragment extends BaseFragment implements SensorEventL
 
     @Override
     public void onReverseGeocoderResponse(NMapPlacemark nMapPlacemark, NMapError nMapError) {
-        locationTextView.setText(nMapPlacemark.toString());
+        fragmentStatisticsBinding.locationTextview.setText(nMapPlacemark.toString());
     }
 
     private class MapViewStateChangeListener implements NMapView.OnMapStateChangeListener {

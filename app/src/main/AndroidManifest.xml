@@ -21,14 +21,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.StatisticsActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".ui.splash.SplashActivity"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
+        <activity
+            android:name=".ui.statistics.StatisticsActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
 
         <receiver android:name=".broadcastreceiver.BootReceiver">
@@ -51,7 +56,7 @@
         <provider
             android:name=".database.PedometerContentProvider"
             android:authorities="@string/content_authority"
-            android:exported="true"/>
+            android:exported="true" />
 
         <receiver android:name=".broadcastreceiver.ShutdownRecevier">
             <intent-filter>

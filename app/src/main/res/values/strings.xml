@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Penometer</string>
+    <string name="app_name">Pedometer</string>
 
     <string name="title_pedometer_history">History</string>
     <string name="title_pedometer_status">Status</string>

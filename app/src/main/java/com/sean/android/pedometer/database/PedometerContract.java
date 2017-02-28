@@ -20,7 +20,7 @@ public class PedometerContract implements BaseColumns {
 
     public final static Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
-    public static final String PATH_PENOMETER = "penometer";
+    public static final String PATH_PEDOMETER = "pedometer";
 
 
     static final String SQL_CREATE_STEPS_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +

@@ -1,37 +1,30 @@
-package com.sean.android.pedometer.ui;
+package com.sean.android.pedometer.ui.statistics;
 
 import android.Manifest;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.sean.android.pedometer.R;
+import com.sean.android.pedometer.databinding.ActivityStatisticsBinding;
 import com.sean.android.pedometer.service.PedometerService;
 import com.sean.android.pedometer.service.PedometerSystemOverlayService;
+import com.sean.android.pedometer.ui.PedoHistorysFragment;
+import com.sean.android.pedometer.ui.PedoStatisticsFragment;
+import com.sean.android.pedometer.ui.TabViewPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class StatisticsActivity extends AppCompatActivity implements PermissionListener {
-    @BindView(R.id.statisticsViewPager)
-    ViewPager statisticsViewPager;
-
-    @BindView(R.id.tabLayout)
-    TabLayout tabLayout;
 
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    private ActivityStatisticsBinding mActivityStatisticsBinding;
 
 
     private PedoStatisticsFragment statisticsFragment;
@@ -40,16 +33,15 @@ public class StatisticsActivity extends AppCompatActivity implements PermissionL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_statistics);
-        ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
+        mActivityStatisticsBinding = DataBindingUtil.setContentView(this, R.layout.activity_statistics);
+        setSupportActionBar(mActivityStatisticsBinding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         TabViewPagerAdapter tabViewPagerAdapter = new TabViewPagerAdapter(getSupportFragmentManager(), this);
         tabViewPagerAdapter.setFragmentList(createTabFragments());
 
-        statisticsViewPager.setAdapter(tabViewPagerAdapter);
-        tabLayout.setupWithViewPager(statisticsViewPager);
+        mActivityStatisticsBinding.statisticsViewPager.setAdapter(tabViewPagerAdapter);
+        mActivityStatisticsBinding.tabLayout.setupWithViewPager(mActivityStatisticsBinding.statisticsViewPager);
         checkPermission();
 
         startService(new Intent(this, PedometerService.class));
@@ -97,7 +89,7 @@ public class StatisticsActivity extends AppCompatActivity implements PermissionL
 
     @Override
     public void onPermissionGranted() {
-        if(statisticsFragment != null) {
+        if (statisticsFragment != null) {
             statisticsFragment.stepsDistanceChanged();
         }
     }

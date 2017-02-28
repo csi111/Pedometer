@@ -21,8 +21,8 @@ import static com.sean.android.pedometer.database.PedometerContract.TABLE_NAME;
 
 public class PedometerContentProvider extends ContentProvider {
     public static final int CODE_TOTAL_STEP = 100;
-    public static final int CODE_PENOMETER_HISTORY = 101;
-    public static final int CODE_PENOMETER_HISTORY_WITH_DATE = 102;
+    public static final int CODE_PEDOMETER_HISTORY = 101;
+    public static final int CODE_PEDOMETER_HISTORY_WITH_DATE = 102;
 
 
     private PedometerDBHelper dbHelper;
@@ -41,11 +41,11 @@ public class PedometerContentProvider extends ContentProvider {
         Cursor cursor;
 
         switch (uriMatcher.match(uri)) {
-            case CODE_PENOMETER_HISTORY: {
+            case CODE_PEDOMETER_HISTORY: {
                 cursor = dbHelper.getReadableDatabase().query(PedometerContract.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             }
-            case CODE_PENOMETER_HISTORY_WITH_DATE: {
+            case CODE_PEDOMETER_HISTORY_WITH_DATE: {
                 String dateString = uri.getLastPathSegment();
                 SimpleDateFormat transFormat = new SimpleDateFormat("yyyy.MM.dd");
                 long dateMills = System.currentTimeMillis();
@@ -90,8 +90,8 @@ public class PedometerContentProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         switch (uriMatcher.match(uri)) {
-            case CODE_PENOMETER_HISTORY:
-            case CODE_PENOMETER_HISTORY_WITH_DATE:
+            case CODE_PEDOMETER_HISTORY:
+            case CODE_PEDOMETER_HISTORY_WITH_DATE:
                 return CONTENT_TYPE;
 
             case CODE_TOTAL_STEP:
@@ -122,9 +122,9 @@ public class PedometerContentProvider extends ContentProvider {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         String authority = PedometerContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority, PedometerContract.PATH_PENOMETER, CODE_PENOMETER_HISTORY);
-        matcher.addURI(authority, PedometerContract.PATH_PENOMETER + "/Total", CODE_TOTAL_STEP);
-        matcher.addURI(authority, PedometerContract.PATH_PENOMETER + "/#", CODE_PENOMETER_HISTORY_WITH_DATE);
+        matcher.addURI(authority, PedometerContract.PATH_PEDOMETER, CODE_PEDOMETER_HISTORY);
+        matcher.addURI(authority, PedometerContract.PATH_PEDOMETER + "/Total", CODE_TOTAL_STEP);
+        matcher.addURI(authority, PedometerContract.PATH_PEDOMETER + "/#", CODE_PEDOMETER_HISTORY_WITH_DATE);
 
 
         return matcher;

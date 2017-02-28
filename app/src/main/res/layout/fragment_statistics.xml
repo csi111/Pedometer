@@ -1,97 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_statistics"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.sean.android.pedometer.ui.PedoStatisticsFragment"
-    tools:showIn="@layout/activity_statistics">
 
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
-        android:id="@+id/step_container"
+        android:id="@+id/content_statistics"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/title_container_height"
-        android:background="#ffffff"
-        android:gravity="center_vertical"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp">
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="com.sean.android.pedometer.ui.PedoStatisticsFragment"
+        tools:showIn="@layout/activity_statistics">
 
-        <TextView
-            android:id="@+id/stepcount_title_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:gravity="center_vertical"
-            android:text="@string/title_stepcount"
-            android:textColor="@color/colorMapTitle"
-            android:textSize="@dimen/map_view_title_size"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/step_textview"
-            style="@style/AppTheme.PenometerContainerTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/default_little_big_text_size" />
-
-    </RelativeLayout>
-
-
-    <RelativeLayout
-        android:id="@+id/distance_container"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/title_container_height"
-        android:layout_below="@+id/step_container"
-        android:background="#ffffff"
-        android:gravity="center_vertical"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp">
-
-        <TextView
-            android:id="@+id/distance_title_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:gravity="center_vertical"
-            android:text="@string/title_distance"
-            android:textColor="@color/colorMapTitle"
-            android:textSize="@dimen/map_view_title_size"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/distance_textview"
-            style="@style/AppTheme.PenometerContainerTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/default_little_big_text_size" />
-
-    </RelativeLayout>
-
-    <Button
-        android:id="@+id/pause_button"
-        style="@style/AppTheme.PenometerButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp" />
-
-
-    <LinearLayout
-        android:id="@+id/naver_map_container"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_below="@+id/distance_container"
-        android:orientation="vertical">
 
         <RelativeLayout
+            android:id="@+id/step_container"
             android:layout_width="match_parent"
             android:layout_height="@dimen/title_container_height"
             android:background="#ffffff"
@@ -100,31 +25,110 @@
             android:paddingRight="16dp">
 
             <TextView
-                android:id="@+id/map_title_textview"
+                android:id="@+id/stepcount_title_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
                 android:gravity="center_vertical"
-                android:text="@string/title_location"
+                android:text="@string/title_stepcount"
                 android:textColor="@color/colorMapTitle"
                 android:textSize="@dimen/map_view_title_size"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/location_textview"
-                style="@style/AppTheme.PenometerContainerTextStyle"
+                android:id="@+id/step_textview"
+                style="@style/AppTheme.PedometerContainerTextStyle"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/default_little_big_text_size" />
 
         </RelativeLayout>
 
 
-        <com.nhn.android.maps.NMapView
+        <RelativeLayout
+            android:id="@+id/distance_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/location_textview" />
+            android:layout_height="@dimen/title_container_height"
+            android:layout_below="@+id/step_container"
+            android:background="#ffffff"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/distance_title_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                android:text="@string/title_distance"
+                android:textColor="@color/colorMapTitle"
+                android:textSize="@dimen/map_view_title_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/distance_textview"
+                style="@style/AppTheme.PedometerContainerTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/default_little_big_text_size" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/pause_button"
+            style="@style/AppTheme.PedometerButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp" />
 
 
-</RelativeLayout>
+        <LinearLayout
+            android:id="@+id/naver_map_container"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_below="@+id/distance_container"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_container_height"
+                android:background="#ffffff"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/map_title_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/title_location"
+                    android:textColor="@color/colorMapTitle"
+                    android:textSize="@dimen/map_view_title_size"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/location_textview"
+                    style="@style/AppTheme.PedometerContainerTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+
+            </RelativeLayout>
+
+
+            <com.nhn.android.maps.NMapView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/location_textview" />
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</layout>

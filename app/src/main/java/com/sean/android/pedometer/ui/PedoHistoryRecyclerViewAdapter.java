@@ -32,7 +32,7 @@ public class PedoHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PedoHis
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_penometer_history, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_pedometer_history, parent, false);
         return new ViewHolder(view);
     }
 

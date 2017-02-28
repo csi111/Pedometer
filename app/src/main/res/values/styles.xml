@@ -13,9 +13,9 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="menu_labels_style">
         <item name="android:textColor">@android:color/white</item>
@@ -35,7 +35,7 @@
     </style>
 
 
-    <style name="AppTheme.PenometerContainerTextStyle" parent="android:TextAppearance.Widget.TextView">
+    <style name="AppTheme.PedometerContainerTextStyle" parent="android:TextAppearance.Widget.TextView">
         <item name="android:textSize">@dimen/map_view_location_size</item>
         <item name="android:textColor">@color/colorLocationTitle</item>
         <item name="android:layout_marginLeft">7dp</item>
@@ -44,25 +44,25 @@
         <item name="android:gravity">right|center_vertical</item>
     </style>
 
-    <style name="AppTheme.PenometerStepTextStyle" parent="android:TextAppearance.Widget.TextView">
+    <style name="AppTheme.PedometerStepTextStyle" parent="android:TextAppearance.Widget.TextView">
         <item name="android:textSize">@dimen/default_step_list_text_size</item>
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
-    <style name="AppTheme.PenometerTextStyle" parent="android:TextAppearance.Widget.TextView">
+    <style name="AppTheme.PedometerTextStyle" parent="android:TextAppearance.Widget.TextView">
         <item name="android:textSize">@dimen/default_text_size</item>
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
-    <style name="AppTheme.PenometerBigTextStyle" parent="AppTheme.PenometerTextStyle">
+    <style name="AppTheme.PedometerBigTextStyle" parent="AppTheme.PedometerTextStyle">
         <item name="android:textSize">@dimen/default_big_text_size</item>
     </style>
 
-    <style name="AppTheme.PenometerLittleBigTextStyle" parent="AppTheme.PenometerTextStyle">
+    <style name="AppTheme.PedometerLittleBigTextStyle" parent="AppTheme.PedometerTextStyle">
         <item name="android:textSize">@dimen/default_little_big_text_size</item>
     </style>
 
-    <style name="AppTheme.PenometerButtonStyle" parent="android:Widget.Button">
+    <style name="AppTheme.PedometerButtonStyle" parent="android:Widget.Button">
         <item name="android:textSize">@dimen/default_text_size</item>
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:background">@color/colorPrimary</item>

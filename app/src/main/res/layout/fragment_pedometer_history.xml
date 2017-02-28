@@ -11,7 +11,7 @@
 
     <TextView
         android:id="@+id/date_textview"
-        style="@style/AppTheme.PenometerTextStyle"
+        style="@style/AppTheme.PedometerTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
@@ -25,7 +25,7 @@
 
     <TextView
         android:id="@+id/stepcount_textview"
-        style="@style/AppTheme.PenometerStepTextStyle"
+        style="@style/AppTheme.PedometerStepTextStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
@@ -36,7 +36,7 @@
 
     <TextView
         android:id="@+id/distance_textview"
-        style="@style/AppTheme.PenometerTextStyle"
+        style="@style/AppTheme.PedometerTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
