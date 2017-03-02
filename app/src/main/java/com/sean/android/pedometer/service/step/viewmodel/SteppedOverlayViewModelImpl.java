@@ -7,10 +7,36 @@ import android.databinding.ObservableField;
  */
 
 public class SteppedOverlayViewModelImpl implements SteppedOverlayViewModel {
-    private ObservableField<String> mStepCountText;
+    private final ObservableField<String> mStepCountText = new ObservableField<>();
 
-    private ObservableField<String> mDistanceText;
+    private final ObservableField<String> mDistanceText = new ObservableField<>();
 
 
+    public SteppedOverlayViewModelImpl() {
+    }
 
+    public SteppedOverlayViewModelImpl(String stepCount, String distance) {
+        mStepCountText.set(stepCount);
+        mDistanceText.set(distance);
+    }
+
+    @Override
+    public ObservableField<String> getStepCountText() {
+        return mStepCountText;
+    }
+
+    @Override
+    public ObservableField<String> getDistanceText() {
+        return mDistanceText;
+    }
+
+    @Override
+    public void setStepCount(String stepCount) {
+        mStepCountText.set(stepCount);
+    }
+
+    @Override
+    public void setDistance(String distance) {
+        mDistanceText.set(distance);
+    }
 }

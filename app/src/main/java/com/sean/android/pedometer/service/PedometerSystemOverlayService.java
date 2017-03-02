@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.graphics.PixelFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -16,13 +17,10 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.sean.android.pedometer.R;
 import com.sean.android.pedometer.base.Logger;
@@ -30,10 +28,12 @@ import com.sean.android.pedometer.base.util.CalendarUtil;
 import com.sean.android.pedometer.base.util.DistanceUtil;
 import com.sean.android.pedometer.base.util.SharedPreferencesManager;
 import com.sean.android.pedometer.database.PedometerDBHelper;
+import com.sean.android.pedometer.databinding.ViewPedometerOverlayBinding;
 import com.sean.android.pedometer.model.Pedometer;
+import com.sean.android.pedometer.service.step.SteppedOverlayView;
+import com.sean.android.pedometer.service.step.viewmodel.SteppedOverlayViewModel;
+import com.sean.android.pedometer.service.step.viewmodel.SteppedOverlayViewModelImpl;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
@@ -46,7 +46,8 @@ import static com.sean.android.pedometer.ui.PedoStatisticsFragment.formatter;
 
 public class PedometerSystemOverlayService extends Service implements View.OnTouchListener, SensorEventListener {
 
-    private View overlayMiniView;
+    private SteppedOverlayView overlayMiniView;
+    private SteppedOverlayViewModel steppedOverlayViewModel;
 
     private WindowManager windowManager;
 
@@ -56,18 +57,7 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
     private int originalYPos;
     private boolean moving;
 
-
-    @BindView(R.id.overlay_step_count_textview)
-    TextView stepCountTextView;
-
-    @BindView(R.id.overlay_distance_textview)
-    TextView distanceTextView;
-
-    @BindView(R.id.close_button)
-    ImageButton closeButton;
-
     private SharedPreferencesManager sharedPreferencesManager;
-
 
     private int todayOffset;
     private int sinceBoot;
@@ -134,10 +124,9 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
     }
 
     public void startOverlay() {
-        LayoutInflater mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        overlayMiniView = mInflater.inflate(R.layout.view_pedometer_overlay, null);
-        ButterKnife.bind(this, overlayMiniView);
-
+        overlayMiniView = new SteppedOverlayView(this);
+        steppedOverlayViewModel = new SteppedOverlayViewModelImpl();
+        overlayMiniView.setViewModel(steppedOverlayViewModel);
         overlayMiniView.setOnTouchListener(this);
         WindowManager.LayoutParams params = new WindowManager.LayoutParams((int) getResources().getDimension(R.dimen.overlayview_width),
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -275,12 +264,7 @@ public class PedometerSystemOverlayService extends Service implements View.OnTou
         // todayOffset might still be Integer.MIN_VALUE on first start
         float footSize = sharedPreferencesManager.getPrefFloatData(Pedometer.PREF_STEP_SIZE_KEY, DEFAULT_STEP_SIZE);
         float distanceToday = todaySteps * footSize;
-        stepCountTextView.setText(formatter.format(todaySteps));
-        distanceTextView.setText(DistanceUtil.convertDistanceMeter(distanceToday));
-    }
-
-    @OnClick(R.id.close_button)
-    void onClose(View view) {
-        stopSelf();
+        steppedOverlayViewModel.setStepCount(formatter.format(todaySteps));
+        steppedOverlayViewModel.setDistance(DistanceUtil.convertDistanceMeter(distanceToday));
     }
 }

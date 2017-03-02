@@ -1,91 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
-        android:layout_width="@dimen/overlayview_width"
-        android:layout_height="@dimen/overlayview_height">
+    <data>
 
+        <variable
+            name="viewModel"
+            type="com.sean.android.pedometer.service.step.viewmodel.SteppedOverlayViewModel" />
 
-        <RelativeLayout
-            android:id="@+id/step_container"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/title_container_height"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/colorOverlayViewBackground"
-            android:gravity="center_vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+    </data>
 
-            <TextView
-                android:id="@+id/stepcount_title_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_centerVertical="true"
-                android:gravity="center_vertical"
-                android:text="@string/title_stepcount"
-                android:textColor="@color/colorMapTitle"
-                android:textSize="@dimen/map_view_title_size"
-                android:textStyle="bold" />
-
-
-            <TextView
-                android:id="@+id/overlay_step_count_textview"
-                style="@style/AppTheme.PedometerContainerTextStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_centerVertical="true"
-                android:textColor="@color/colorPrimary"
-                android:textSize="@dimen/default_step_list_text_size" />
-
-        </RelativeLayout>
-
+    <merge>
 
         <RelativeLayout
-            android:id="@+id/distance_container"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/title_container_height"
-            android:layout_below="@+id/step_container"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/colorOverlayViewBackground"
-            android:gravity="center_vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:layout_width="@dimen/overlayview_width"
+            android:layout_height="@dimen/overlayview_height">
 
-            <TextView
-                android:id="@+id/distance_title_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_centerVertical="true"
+            <RelativeLayout
+                android:id="@+id/step_container"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_container_height"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/colorOverlayViewBackground"
                 android:gravity="center_vertical"
-                android:text="@string/title_distance"
-                android:textColor="@color/colorMapTitle"
-                android:textSize="@dimen/map_view_title_size"
-                android:textStyle="bold" />
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
 
-            <TextView
-                android:id="@+id/overlay_distance_textview"
-                style="@style/AppTheme.PedometerContainerTextStyle"
+                <TextView
+                    android:id="@+id/stepcount_title_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/title_stepcount"
+                    android:textColor="@color/colorMapTitle"
+                    android:textSize="@dimen/map_view_title_size"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/overlay_step_count_textview"
+                    style="@style/AppTheme.PedometerContainerTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:text="@{viewModel.stepCountText}"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/default_step_list_text_size" />
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/distance_container"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_container_height"
+                android:layout_below="@+id/step_container"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@color/colorOverlayViewBackground"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/distance_title_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/title_distance"
+                    android:textColor="@color/colorMapTitle"
+                    android:textSize="@dimen/map_view_title_size"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/overlay_distance_textview"
+                    style="@style/AppTheme.PedometerContainerTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:text="@{viewModel.distanceText}"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/default_text_size" />
+
+            </RelativeLayout>
+
+            <ImageButton
+                android:id="@+id/close_button"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_centerVertical="true"
-                android:textColor="@color/colorPrimary"
-                android:textSize="@dimen/default_text_size" />
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:background="@null"
+                android:src="@drawable/ic_remove_circle" />
 
         </RelativeLayout>
-
-        <ImageButton
-            android:id="@+id/close_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:background="@null"
-            android:src="@drawable/ic_remove_circle" />
-
-    </RelativeLayout>
+    </merge>
 </layout>

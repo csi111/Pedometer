@@ -21,7 +21,6 @@ import com.sean.android.pedometer.databinding.FragmentPedometerHistoryListBindin
 import com.sean.android.pedometer.model.Record;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.sean.android.pedometer.model.Pedometer.PREF_PAUSE_COUNT_KEY;
@@ -44,7 +43,7 @@ public class PedoHistorysFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        records = Collections.emptyList();
+        records = new ArrayList<>();
 
     }
 
